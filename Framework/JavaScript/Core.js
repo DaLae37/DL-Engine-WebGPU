@@ -1,4 +1,4 @@
-import { SceneManager } from "./SceneManager.js";
+import { SceneManager } from "./Scene.js";
 
 let FPS = 60;
 let WIDTH = 1920;
@@ -36,8 +36,10 @@ export function Init() {
 }
 
 export function DoMainLoop(scene) {
-    sceneManager.ChangeScene(scene);
+    sceneManager.ChangeScene(scene, scene.sceneName);
+
     const mainLoop = setInterval(function () {
+        console.log(sceneManager.sceneList);
         sceneManager.UpdateScene(getDeltaTime());
         if (quitMessage) {
             clearInterval(mainLoop);

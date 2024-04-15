@@ -1,8 +1,8 @@
 import {Scene} from "../../Framework/JavaScript/Scene.js";
 
 export class MainScene extends Scene {
-    constructor(){
-        super("Main");
+    constructor(sceneName){
+        super(sceneName);
     }
 
     Update(deltaTime){
