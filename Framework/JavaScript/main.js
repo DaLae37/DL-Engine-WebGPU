@@ -3,9 +3,9 @@ import { MainScene } from "../../Resource/Scene/MainScene.js" //Input First Scen
 
 const firstScene = new MainScene("MainScene"); //Create First Scene
 
-Main();
-
-function Main() {
+async function Main() {
     Core.Init();
     Core.DoMainLoop(firstScene);
 }
+
+Main();

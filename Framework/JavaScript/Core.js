@@ -1,4 +1,5 @@
 import { SceneManager } from "./Scene.js";
+import WGSL from "../WGSL/main.wgsl";
 
 let FPS = 60;
 let WIDTH = 1920;
@@ -10,8 +11,8 @@ canvas.width = WIDTH;
 canvas.height = HEIGHT;
 
 const gpu = navigator.gpu;
-const adapter = await gpu.requestAdapter();
-const device = await adapter.requestDevice();
+export const adapter = await gpu.requestAdapter();
+export const device = await adapter.requestDevice();
 const devicePixelRatio = window.devicePixelRatio || 1;
 const presentationSize = [canvas.clientWidth * devicePixelRatio, canvas.clientHeight * devicePixelRatio];
 const presentationFormat = gpu.getPreferredCanvasFormat()
@@ -20,6 +21,27 @@ context.configure({
     device: device,
     format: presentationFormat,
     size: presentationSize
+});
+
+const pipeline = device.createRenderPipeline({
+    layout: 'auto',
+    vertex: {
+        module: device.createShaderModule({
+            code: WGSL,
+        }),
+        entryPoint: 'vs',
+    },
+    fragment: {
+        module: device.createShaderModule({
+            code: WGSL,
+        }),
+        entryPoint: 'fs',
+        targets: [
+            {
+                format: presentationFormat,
+            },
+        ],
+    },
 });
 
 const sceneManager = new SceneManager();
@@ -39,7 +61,15 @@ export function DoMainLoop(scene) {
     sceneManager.ChangeScene(scene, scene.sceneName);
 
     const mainLoop = setInterval(function () {
-        console.log(sceneManager.sceneList);
+        const commandEncoder = device.createCommandEncoder();
+        const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+        passEncoder.setPipeline(pipeline);
+        passEncoder.setBindGroup(0, uniformBindGroup);
+        passEncoder.setVertexBuffer(0, verticesBuffer);
+        sceneManager.RenderScene(getDeltaTime());
+        passEncoder.end();
+        device.queue.submit([commandEncoder.finish()]);
+
         sceneManager.UpdateScene(getDeltaTime());
         if (quitMessage) {
             clearInterval(mainLoop);
@@ -47,7 +77,7 @@ export function DoMainLoop(scene) {
     }, 1000 / FPS);
 }
 
-function InitCanvas(){
+function InitCanvas() {
     console.log("width : ", canvas.width, "height : ", canvas.height);
 }
 
@@ -57,6 +87,10 @@ function InitDevice() {
         throw new Error("No appropriate GPUAdapter found.");
     }
     console.log(presentationFormat);
+}
+
+function InitPipeLine() {
+
 }
 
 function InitDeltaTime() {

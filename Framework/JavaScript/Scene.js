@@ -11,6 +11,12 @@ export class Scene {
         }
     }
 
+    Render(deltaTime){
+        for (const object in this.objectList){
+            object.Render(deltaTime);
+        }
+    }
+
     AddObject(object) {
         this.objectList.push(object);
     }
@@ -40,6 +46,10 @@ export class SceneManager {
 
     UpdateScene(deltaTime) {
         this.currentScene.Update(deltaTime);
+    }
+
+    RenderScene(deltaTime) {
+        this.currentScene.Render(deltaTime);
     }
 
     AddScene(scene, sceneName) {
