@@ -1,107 +1,76 @@
-import { SceneManager } from "./Scene.js";
-import WGSL from "../WGSL/main.wgsl";
+const canvas = new Canvas();
+const device = new Device();
 
-let FPS = 60;
-let WIDTH = 1920;
-let HEIGHT = 1080;
+export {canvas, device};
 
-const canvas = document.createElement("canvas");
-document.body.appendChild(canvas);
-canvas.width = WIDTH;
-canvas.height = HEIGHT;
+class Canvas {
+    constructor() {
+        this.WIDTH = 1920;
+        this.HEIGHT = 1080;
+        this.canvas = null;
 
-const gpu = navigator.gpu;
-export const adapter = await gpu.requestAdapter();
-export const device = await adapter.requestDevice();
-const devicePixelRatio = window.devicePixelRatio || 1;
-const presentationSize = [canvas.clientWidth * devicePixelRatio, canvas.clientHeight * devicePixelRatio];
-const presentationFormat = gpu.getPreferredCanvasFormat()
-const context = canvas.getContext("webgpu");
-context.configure({
-    device: device,
-    format: presentationFormat,
-    size: presentationSize
-});
-
-const pipeline = device.createRenderPipeline({
-    layout: 'auto',
-    vertex: {
-        module: device.createShaderModule({
-            code: WGSL,
-        }),
-        entryPoint: 'vs',
-    },
-    fragment: {
-        module: device.createShaderModule({
-            code: WGSL,
-        }),
-        entryPoint: 'fs',
-        targets: [
-            {
-                format: presentationFormat,
-            },
-        ],
-    },
-});
-
-const sceneManager = new SceneManager();
-
-let quitMessage = false;
-
-let currentTime = 0;
-let previousTime = 0;
-
-export function Init() {
-    InitCanvas();
-    InitDevice();
-    InitDeltaTime();
-}
-
-export function DoMainLoop(scene) {
-    sceneManager.ChangeScene(scene, scene.sceneName);
-
-    const mainLoop = setInterval(function () {
-        const commandEncoder = device.createCommandEncoder();
-        const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-        passEncoder.setPipeline(pipeline);
-        passEncoder.setBindGroup(0, uniformBindGroup);
-        passEncoder.setVertexBuffer(0, verticesBuffer);
-        sceneManager.RenderScene(getDeltaTime());
-        passEncoder.end();
-        device.queue.submit([commandEncoder.finish()]);
-
-        sceneManager.UpdateScene(getDeltaTime());
-        if (quitMessage) {
-            clearInterval(mainLoop);
-        }
-    }, 1000 / FPS);
-}
-
-function InitCanvas() {
-    console.log("width : ", canvas.width, "height : ", canvas.height);
-}
-
-function InitDevice() {
-    console.log("gpu : ", gpu);
-    if (!adapter) {
-        throw new Error("No appropriate GPUAdapter found.");
+        this.InitCanvas();
     }
-    console.log(presentationFormat);
+
+    InitCanvas() {
+        this.canvas = document.createElement("canvas");
+        this.canvas.width = WIDTH;
+        this.canvas.height = HEIGHT;
+
+        console.log("canvas width : ", this.canvas.width, "height : ", this.canvas.height);
+
+        document.body.appendChild(this.canvas);
+    }
+
+
+    getCanvas() {
+        return this.canvas;
+    }
 }
 
-function InitPipeLine() {
+export class Device {
+    constructor() {
+        this.gpu = null;
+        this.adapter = null
+        this.device = null;
+        this.context = null;
 
-}
+        this.InitDevice();
+    }
 
-function InitDeltaTime() {
-    currentTime = performance.now();
-    previousTime = performance.now();
-}
+    async InitDevice() {
+        this.gpu = navigator.gpu;
+        console.log("gpu : ", gpu);
 
-function getDeltaTime() {
-    currentTime = performance.now();
-    var deltaTime = currentTime - previousTime;
-    previousTime = currentTime;
+        this.adapter = await this.gpu?.requestAdapter();
+        if (!this.adapter) {
+            console.log("adapter failed");
+            return;
+        }
 
-    return deltaTime;
+        this.device = await this.adapter?.requestDevice();
+        if (!this.device) {
+            console.log("device failed");
+            this.device.lost.then((info) => {
+                if (info.reason !== "destroyed") {
+                    this.InitDevice();
+                }
+                else {
+                    return;
+                }
+            });
+        }
+    }
+
+    getGPU() {
+        return this.gpu;
+    }
+
+    getAdapter() {
+        return this.adapter;
+    }
+
+    getDevice() {
+        return this.device;
+    }
 }

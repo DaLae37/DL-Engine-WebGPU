@@ -1,11 +1,12 @@
-import * as Core from "./Core.js";
+import { Engine } from "./Engine.js";
 import { MainScene } from "../../Resource/Scene/MainScene.js" //Input First Scene File Names
 
 const firstScene = new MainScene("MainScene"); //Create First Scene
+const engine = new Engine();
 
 async function Main() {
-    Core.Init();
-    Core.DoMainLoop(firstScene);
+    engine.Init();
+    engine.DoMainLoop(firstScene);
 }
 
-Main();
+await Main();
