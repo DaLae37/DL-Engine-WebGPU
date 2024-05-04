@@ -1,21 +1,21 @@
+import { device } from "../../Framework/JavaScript/Core.js";
 import { Scene } from "../../Framework/JavaScript/Scene.js";
 import { Sprite } from "../../Framework/JavaScript/Sprite.js";
 
 export class MainScene extends Scene {
     constructor(sceneName) {
-        super(sceneName);
-
-        this.logo = new Sprite("../Images/dl-logo.png");
+        super(sceneName);         
+        this.sprite = new Sprite("Resource/Images/dl-logo.png");
     }
 
     Update(deltaTime) {
         super.Update(deltaTime);
+
+        this.sprite.Render();
     }
 
-    Render(deltatime) {
+    Render(deltaTime) {
         super.Render(deltaTime);
-
-        this.logo.Render();
     }
 }
 

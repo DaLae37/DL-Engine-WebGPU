@@ -1,20 +1,21 @@
-import { canvas, device } from "./Core.js";
-import { SceneManager } from "./Scene.js";
-import WGSL from "../WGSL/main.wgsl";
+import { canvas, device, shaderModule } from "./Core.js"
+import { sceneManager } from "./Scene.js";
 
 export class Engine {
-    construct() {
-        this.context = null;
-
-        this.sceneManager = new SceneManager();
-
+    constructor() {
         this.FPS = 60;
-        this.quitMessage = false;
-
+        
         this.currentTime = 0;
         this.previousTime = 0;
+    }
 
-        this.InitContext();
+    async Init() {
+        canvas.InitCanvas();
+        await device.InitDevice();
+        device.InitContext();
+
+        shaderModule.SetShader();
+
         this.InitDeltaTime();
     }
 
@@ -24,31 +25,19 @@ export class Engine {
         const mainLoop = setInterval(() => {
             sceneManager.RenderScene(this.getDeltaTime());
             sceneManager.UpdateScene(this.getDeltaTime());
+            let quitMessage = sceneManager.CheckQuitMessage();
             if (quitMessage) {
                 clearInterval(mainLoop);
             }
-        }, 1000 / FPS);
+        }, 1000 / this.FPS);
     }
 
     getDeltaTime() {
         this.currentTime = performance.now();
-        var deltaTime = this.currentTime - this.previousTime;
+        let deltaTime = this.currentTime - this.previousTime;
         this.previousTime = this.currentTime;
 
         return deltaTime;
-    }
-
-    InitContext() {
-        var devicePixelRatio = window.devicePixelRatio || 1;
-        var presentationSize = [canvas.getCanvas.clientWidth * devicePixelRatio, canvas.getCanvas.clientHeight * devicePixelRatio];
-        var presentationFormat = device.getGPU.getPreferredCanvasFormat();
-
-        this.context = canvas.getCanvas.getContext("webgpu");
-        this.context.configure({
-            device: device.getDevice,
-            format: presentationFormat,
-            size: presentationSize
-        });
     }
 
     InitDeltaTime() {

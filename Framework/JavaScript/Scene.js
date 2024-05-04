@@ -2,6 +2,7 @@ export class Scene {
     constructor(sceneName) {
         this.sceneName = sceneName;
         this.objectList = []; //Array
+        this.quitMessage = false;
         console.log("Create", this.sceneName);
     }
 
@@ -26,10 +27,10 @@ export class Scene {
     }
 }
 
-export class SceneManager {
+class SceneManager {
     constructor() {
         this.currentScene = null;
-        this.sceneList = {}; //Dictionary
+        this.sceneDictionary = {}; //Dictionary
     }
 
     ChangeScene(scene, sceneName = "null") {
@@ -37,7 +38,7 @@ export class SceneManager {
             this.currentScene = scene;
         }
         else {
-            if (!(sceneName in this.sceneList)) {
+            if (!(sceneName in this.sceneDictionary)) {
                 this.AddScene(scene, sceneName);
             }
             this.currentScene = scene;
@@ -53,12 +54,20 @@ export class SceneManager {
     }
 
     AddScene(scene, sceneName) {
-        this.sceneList[sceneName] = scene;
+        this.sceneDictionary[sceneName] = scene;
     }
 
     DeleteScene(sceneName) {
-        if (sceneName in this.sceneList) {
-            delete this.sceneList[sceneName];
+        if (sceneName in this.sceneDictionary) {
+            delete this.sceneDictionary[sceneName];
         }
     }
+
+    CheckQuitMessage(){
+        return this.currentScene.quitMessage;
+    }
 }
+
+const sceneManager = new SceneManager();
+
+export {sceneManager}
