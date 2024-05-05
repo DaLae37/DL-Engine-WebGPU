@@ -1,5 +1,5 @@
 import { Object, ObjectManager } from "./Object.js";
-import { device, shaderModule } from "./Core.js";
+import { canvas, device, shaderModule } from "./Core.js";
 
 export class Sprite extends Object {
     constructor(src, spriteName = "null") {
@@ -17,6 +17,13 @@ export class Sprite extends Object {
 
     Update(deltaTime) {
         super.Update(deltaTime);
+
+        let uniformValues = new Float32Array(this.uniformBufferSize / 4);
+
+        uniformValues.set([this.transform.position.x, this.transform.position.y], 0);
+        uniformValues.set([this.transform.scale.x, this.transform.scale.y], 2);
+        uniformValues.set([0, 0, 0, 1], 4);
+        device.getDevice().queue.writeBuffer(this.uniformBuffer, 0, uniformValues);
     }
 
     Render(deltaTime) {
@@ -24,7 +31,7 @@ export class Sprite extends Object {
 
         this.renderPassDescriptor.colorAttachments[0].view = device.getContext().getCurrentTexture().createView();
 
-        let encoder = device.getDevice().createCommandEncoder({label: "sprite encoder"});
+        let encoder = device.getDevice().createCommandEncoder({ label: "sprite encoder" });
         let pass = encoder.beginRenderPass(this.renderPassDescriptor);
         pass.setPipeline(this.pipeline);
         pass.setBindGroup(0, this.group[0]);
@@ -51,6 +58,16 @@ export class Sprite extends Object {
             },
         });
 
+        this.uniformBufferSize =
+            2 * 4 + //translate
+            2 * 4 + //scale
+            4 * 4; //color
+        this.uniformBuffer = device.getDevice().createBuffer({
+            label: "texture",
+            size: this.uniformBufferSize,
+            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        });
+
         for (let i = 0; i < 8; ++i) {
             this.sampler = device.getDevice().createSampler({
                 addressModeU: (i & 1) ? "repeat" : "clamp-to-edge",
@@ -63,6 +80,7 @@ export class Sprite extends Object {
                 entries: [
                     { binding: 0, resource: this.sampler },
                     { binding: 1, resource: this.texture.createView() },
+                    { binding: 2, resource: { buffer: this.uniformBuffer } }
                 ],
             });
             this.group.push(binding);

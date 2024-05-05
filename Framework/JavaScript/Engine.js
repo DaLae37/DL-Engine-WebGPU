@@ -23,8 +23,8 @@ export class Engine {
         sceneManager.ChangeScene(scene, scene.sceneName);
 
         const mainLoop = setInterval(() => {
-            sceneManager.RenderScene(this.getDeltaTime());
             sceneManager.UpdateScene(this.getDeltaTime());
+            sceneManager.RenderScene(this.getDeltaTime());
             let quitMessage = sceneManager.CheckQuitMessage();
             if (quitMessage) {
                 clearInterval(mainLoop);
@@ -37,7 +37,7 @@ export class Engine {
         let deltaTime = this.currentTime - this.previousTime;
         this.previousTime = this.currentTime;
 
-        return deltaTime;
+        return deltaTime / 1000;
     }
 
     InitDeltaTime() {

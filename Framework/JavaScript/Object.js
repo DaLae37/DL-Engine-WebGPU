@@ -1,7 +1,9 @@
-import {device} from "./Core.js"
+import { Transform } from "./Tool.js"
 
 export class Object {
     constructor(name) {
+        this.transform = new Transform();
+
         this.name = name;
 
         this.module = null;
@@ -10,6 +12,9 @@ export class Object {
         this.sampler = null;
         this.group = [];
         this.renderPassDescriptor = null;
+
+        this.uniformBufferSize = 0;
+        this.uniformBuffer = null;
     }
 
     Update(deltaTime) {
@@ -20,12 +25,42 @@ export class Object {
 
     }
 
-    SetRender(){
-        
+    SetRender() {
+
     }
 
-    async SetResource(){
+    async SetResource() {
 
+    }
+
+    Translate(position) {
+        this.transform.position.x += position.x;
+        this.transform.position.y += position.y;
+        this.transform.position.z += position.z;
+    }
+
+    setPosition(position) {
+        this.transform.position = position;
+    }
+
+    setScale(scale) {
+        this.transform.scale = scale;
+    }
+
+    setRotation(rotation) {
+        this.transform.rotation = rotation;
+    }
+
+    getPosition() {
+        return this.transform.position;
+    }
+
+    getScale() {
+        return this.transform.scale;
+    }
+
+    getRotation() {
+        return this.transform.rotation;
     }
 }
 
@@ -35,10 +70,10 @@ export class ObjectManager {
     }
 
     async LoadImageToSrc(src) {
-        if(src in this.objectDictionary){
+        if (src in this.objectDictionary) {
             return this.objectDictionary[src];
         }
-        else{
+        else {
             let response = await fetch(src);
 
             if (response.ok) {

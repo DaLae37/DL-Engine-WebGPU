@@ -64,7 +64,8 @@ class Device {
         this.context.configure({
             device: this.device,
             format: this.presentationFormat,
-            size: presentationSize
+            size: presentationSize,
+            alphamode : "premultiplied"
         });
     }
 
