@@ -21,19 +21,15 @@ export class Object {
 
     }
 
+    SetRender() {
+
+    }
+
     Update(deltaTime) {
 
     }
 
     Render(deltaTime) {
-
-    }
-
-    SetRender() {
-
-    }
-
-    async SetResource() {
 
     }
 

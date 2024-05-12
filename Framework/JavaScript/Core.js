@@ -86,6 +86,7 @@ class Device {
     }
 }
 
+import { cubeShader } from "../Shader/cube.js";
 import { textureShader } from "../Shader/texture.js"
 
 class ShaderModule {
@@ -97,6 +98,7 @@ class ShaderModule {
     SetShader() {
         if (device.getDevice()) { //Add Using Shaders
             this.shaderDictionary["texture"] = textureShader;
+            this.shaderDictionary["cube"] = cubeShader;
             //this.shaderDictionary["label"] = shader;
         }
         else {

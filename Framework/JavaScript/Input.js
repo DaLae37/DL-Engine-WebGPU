@@ -1,9 +1,11 @@
+import { canvas } from "./Core.js";
+
 class InputManager {
     constructor() {
         this.beforeKeyState = {}; //Dictionary
         this.currentKeyState = {}; //Dictionary
         this.mouseState = false; // false : up, true : down
-        this.Init();
+        this.mousePosition = [0,0] //Array [x, y]
     }
 
     UpdateKeyState() {
@@ -33,6 +35,11 @@ class InputManager {
         document.addEventListener("mouseup", (mouse) => {
             this.mouseState = false;
         })
+
+        canvas.getCanvas().addEventListener("mousemove", (event) =>{
+            this.mousePosition[0] = event.pageX;
+            this.mousePosition[1] = event.pageY;
+        });
     }
 
     GetKeyDown(key) {
@@ -62,7 +69,7 @@ class InputManager {
     }
 
     GetMousePosition() {
-
+        return this.mousePosition;
     }
 }
 

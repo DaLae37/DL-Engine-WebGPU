@@ -14,9 +14,10 @@ export class Engine {
         canvas.InitCanvas();
         await device.InitDevice();
         device.InitContext();
-
         shaderModule.SetShader();
 
+        inputManager.Init();
+        
         this.InitDeltaTime();
     }
 

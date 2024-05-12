@@ -14,6 +14,8 @@ export class Sprite extends Object {
     }
 
     async LoadResource(){
+        super.LoadResource();
+
         this.image = await spriteManager.LoadImageToSrc(this.src);
         this.width = this.image.width;
         this.height = this.image.height;
@@ -33,33 +35,6 @@ export class Sprite extends Object {
         );
 
         this.SetRender();
-    }
-
-    Update(deltaTime) {
-        super.Update(deltaTime);
-
-        let uniformValues = new Float32Array(this.uniformBufferSize / 4);
-
-        uniformValues.set([this.transform.position.x, this.transform.position.y], 0);
-        uniformValues.set([this.transform.scale.x, this.transform.scale.y], 2);
-        uniformValues.set([1, 1, 1, 1], 4);
-        device.getDevice().queue.writeBuffer(this.uniformBuffer, 0, uniformValues);
-    }
-
-    Render(deltaTime) {
-        super.Render(deltaTime);
-
-        this.renderPassDescriptor.colorAttachments[0].view = device.getContext().getCurrentTexture().createView();
-
-        let encoder = device.getDevice().createCommandEncoder({ label: "sprite encoder" });
-        let pass = encoder.beginRenderPass(this.renderPassDescriptor);
-        pass.setPipeline(this.pipeline);
-        pass.setBindGroup(0, this.group[0]);
-        pass.draw(6, 1, 0 ,0);
-        pass.end();
-
-        let commandBuffer = encoder.finish();
-        device.getDevice().queue.submit([commandBuffer]);
     }
 
     SetRender() {
@@ -118,8 +93,31 @@ export class Sprite extends Object {
         };
     }
 
-    async SetResource(src) {
-        
+    Update(deltaTime) {
+        super.Update(deltaTime);
+
+        let uniformValues = new Float32Array(this.uniformBufferSize / 4);
+
+        uniformValues.set([this.transform.position.x, this.transform.position.y], 0);
+        uniformValues.set([this.transform.scale.x, this.transform.scale.y], 2);
+        uniformValues.set([1, 1, 1, 1], 4);
+        device.getDevice().queue.writeBuffer(this.uniformBuffer, 0, uniformValues);
+    }
+
+    Render(deltaTime) {
+        super.Render(deltaTime);
+
+        this.renderPassDescriptor.colorAttachments[0].view = device.getContext().getCurrentTexture().createView();
+
+        let encoder = device.getDevice().createCommandEncoder({ label: "sprite encoder" });
+        let pass = encoder.beginRenderPass(this.renderPassDescriptor);
+        pass.setPipeline(this.pipeline);
+        pass.setBindGroup(0, this.group[0]);
+        pass.draw(6, 1, 0 ,0);
+        pass.end();
+
+        let commandBuffer = encoder.finish();
+        device.getDevice().queue.submit([commandBuffer]);
     }
 
     getSize() {
