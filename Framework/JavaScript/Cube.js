@@ -1,7 +1,7 @@
 import { Object, ObjectManager } from "./Object.js";
 import { canvas, device, shaderModule } from "./Core.js";
 
-export class Sprite extends Object {
+export class Cube extends Object {
     constructor(src, spriteName = "null") {
         super(spriteName);
 
@@ -11,28 +11,8 @@ export class Sprite extends Object {
         this.height = null;
 
         this.src = src;
-    }
 
-    async LoadResource(){
-        this.image = await spriteManager.LoadImageToSrc(this.src);
-        this.width = this.image.width;
-        this.height = this.image.height;
-
-        this.texture = device.getDevice().createTexture({
-            label: this.src,
-            format: "rgba8unorm",
-            size: [this.width, this.height],
-            usage: GPUTextureUsage.TEXTURE_BINDING |
-                GPUTextureUsage.COPY_DST |
-                GPUTextureUsage.RENDER_ATTACHMENT,
-        });
-        device.getDevice().queue.copyExternalImageToTexture(
-            { source: this.image, flipY: true },
-            { texture: this.texture },
-            { width: this.width, height: this.height },
-        );
-
-        this.SetRender();
+        this.SetResource(src);
     }
 
     Update(deltaTime) {
@@ -119,7 +99,27 @@ export class Sprite extends Object {
     }
 
     async SetResource(src) {
-        
+        super.SetResource();
+
+        this.image = await spriteManager.LoadImageToSrc(src);
+        this.width = this.image.width;
+        this.height = this.image.height;
+
+        this.texture = device.getDevice().createTexture({
+            label: src,
+            format: "rgba8unorm",
+            size: [this.width, this.height],
+            usage: GPUTextureUsage.TEXTURE_BINDING |
+                GPUTextureUsage.COPY_DST |
+                GPUTextureUsage.RENDER_ATTACHMENT,
+        });
+        device.getDevice().queue.copyExternalImageToTexture(
+            { source: this.image, flipY: true },
+            { texture: this.texture },
+            { width: this.width, height: this.height },
+        );
+
+        this.SetRender();
     }
 
     getSize() {
@@ -134,11 +134,3 @@ export class Sprite extends Object {
         this.height = height;
     }
 }
-
-class SpriteManager extends ObjectManager {
-    constructor() {
-        super();
-    }
-}
-
-const spriteManager = new SpriteManager();

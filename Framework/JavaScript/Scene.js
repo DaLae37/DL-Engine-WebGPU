@@ -1,21 +1,36 @@
+import {Camera} from "./Camera.js"
+
 export class Scene {
     constructor(sceneName) {
         this.sceneName = sceneName;
         this.objectList = []; //Array
         this.quitMessage = false;
         console.log("Create", this.sceneName);
+
+        this.sceneLoading = false;
+
+        this.mainCamera = new Camera(true);
+    }
+
+    async LoadResource() {
+        if(!this.sceneLoading){
+            this.objectList.forEach((object)=>{
+                object.LoadResource();
+            })
+            this.sceneLoading = true;
+        }
     }
 
     Update(deltaTime) {
-        for (const object in this.objectList) {
+        this.objectList.forEach((object)=>{
             object.Update(deltaTime);
-        }
+        })
     }
 
     Render(deltaTime){
-        for (const object in this.objectList){
+        this.objectList.forEach((object)=>{
             object.Render(deltaTime);
-        }
+        })
     }
 
     AddObject(object) {
@@ -43,6 +58,10 @@ class SceneManager {
             }
             this.currentScene = scene;
         }
+    }
+
+    async LoadResource(){
+        this.currentScene.LoadResource();
     }
 
     UpdateScene(deltaTime) {

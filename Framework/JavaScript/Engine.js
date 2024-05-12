@@ -1,5 +1,6 @@
 import { canvas, device, shaderModule } from "./Core.js"
 import { sceneManager } from "./Scene.js";
+import { inputManager } from "./Input.js";
 
 export class Engine {
     constructor() {
@@ -23,8 +24,14 @@ export class Engine {
         sceneManager.ChangeScene(scene, scene.sceneName);
 
         const mainLoop = setInterval(() => {
-            sceneManager.UpdateScene(this.getDeltaTime());
-            sceneManager.RenderScene(this.getDeltaTime());
+            inputManager.UpdateKeyState();
+            if(!sceneManager.currentScene.sceneLoading){
+                sceneManager.LoadResource();
+            }
+            else {
+                sceneManager.UpdateScene(this.getDeltaTime());
+                sceneManager.RenderScene(this.getDeltaTime());
+            }
             let quitMessage = sceneManager.CheckQuitMessage();
             if (quitMessage) {
                 clearInterval(mainLoop);

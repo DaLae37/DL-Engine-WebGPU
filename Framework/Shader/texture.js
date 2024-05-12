@@ -5,7 +5,13 @@ struct TextureVSOutput {
   @location(0) texcoord : vec2f,
 };
 
-struct Uniform {
+struct Matrix {
+  modelMatrix : mat4x4<f32>,
+  viewMatrix : mat4x4<f32>,
+  projectionMatrix : mat4x4<f32>,
+}
+
+struct Transform {
   translate : vec2f,
   scale : vec2f,
   color : vec4f,
@@ -13,7 +19,7 @@ struct Uniform {
 
 @group(0) @binding(0) var textureSampler : sampler;
 @group(0) @binding(1) var texture : texture_2d<f32>;
-@group(0) @binding(2) var<uniform> uni : Uniform;
+@group(0) @binding(2) var<uniform> transform : Transform;
 
 @vertex fn vs(@builtin(vertex_index) vertexIndex : u32) -> TextureVSOutput {
   var vsOutput: TextureVSOutput;
@@ -31,12 +37,12 @@ struct Uniform {
   );
 
   let xy = pos[vertexIndex];
-  vsOutput.position = vec4f(xy * uni.scale + uni.translate, 0.0, 1.0);
+  vsOutput.position = vec4f(xy * transform.scale + transform.translate, 0.0, 1.0);
   vsOutput.texcoord = xy;
   return vsOutput;
 }
 
 @fragment fn fs(fsInput: TextureVSOutput) -> @location(0) vec4f {
-  return textureSample(texture, textureSampler, fsInput.texcoord);
+  return textureSample(texture, textureSampler, fsInput.texcoord) * transform.color;
 }
 `

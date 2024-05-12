@@ -16,6 +16,10 @@ export class Object {
         this.uniformBufferSize = 0;
         this.uniformBuffer = null;
     }
+    
+    async LoadResource(){
+
+    }
 
     Update(deltaTime) {
 
