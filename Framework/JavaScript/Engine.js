@@ -26,10 +26,7 @@ export class Engine {
 
         const mainLoop = setInterval(() => {
             inputManager.UpdateKeyState();
-            if(!sceneManager.currentScene.sceneLoading){
-                sceneManager.LoadResource();
-            }
-            else {
+            if(sceneManager.currentScene.isLoaded){
                 sceneManager.UpdateScene(this.getDeltaTime());
                 sceneManager.RenderScene(this.getDeltaTime());
             }

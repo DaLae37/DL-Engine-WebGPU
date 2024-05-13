@@ -309,69 +309,13 @@ export class Matrix4 {
 
         return matrix;
     }
-
-    static projection(width, height, depth) {
-        return this.orthographic(width, 0, height, 0, depth, -depth);
-    }
-
-    static perspective(FOV, aspect, zNear, zFar) {
-        let matrix = Array.from(Array(4), () => new Float32Array(4).fill(0));
-
-        matrix[0][0] = cos;
-        matrix[0][1] = 0;
-        matrix[0][2] = 0;
-        matrix[0][3] = 0;
-
-        matrix[1][0] = 0;
-        matrix[1][1] = cos;
-        matrix[1][2] = 0;
-        matrix[1][3] = 0;
-
-        matrix[2][0] = 0;
-        matrix[2][1] = 0;
-        matrix[2][2] = 1;
-        matrix[2][3] = -1;
-
-        matrix[3][0] = 0;
-        matrix[3][1] = 0;
-        matrix[3][2] = 0;
-        matrix[3][3] = 0;
-
-        return matrix;
-    }
-
-    static orthographic(right, left, top, bottom, far, near) {
-        let matrix = Array.from(Array(4), () => new Float32Array(4).fill(0));
-
-        matrix[0][0] = 2 / (right - left);
-        matrix[0][1] = 0;
-        matrix[0][2] = 0;
-        matrix[0][3] = - (right + left) / (right - left);
-
-        matrix[1][0] = 0;
-        matrix[1][1] = 2 / (top - bottom);
-        matrix[1][2] = 0;
-        matrix[1][3] = - (top + bottom) / (top - bottom);
-
-        matrix[2][0] = 0;
-        matrix[2][1] = 0;
-        matrix[2][2] = 1 / (far - near);
-        matrix[2][3] = - near / (far - near);
-
-        matrix[3][0] = 0;
-        matrix[3][1] = 0;
-        matrix[3][2] = 0;
-        matrix[3][3] = 1;
-
-        return matrix
-    }
 }
 
 export class Transform {
     constructor() {
-        this.position = new Vector3();
-        this.scale = new Vector3();
-        this.rotation = new Vector3();
+        this.position = new Vector3(0, 0, 0);
+        this.scale = new Vector3(1, 1, 1);
+        this.rotation = new Vector3(0, 0, 0);
     }
 
     static translate(matrix, offset) { //offset : Vector3

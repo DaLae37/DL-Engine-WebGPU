@@ -1,4 +1,5 @@
-import {Camera} from "./Camera.js"
+import { Camera } from "./Camera.js"
+import { device } from "./Core.js";
 
 export class Scene {
     constructor(sceneName) {
@@ -7,30 +8,56 @@ export class Scene {
         this.quitMessage = false;
         console.log("Create", this.sceneName);
 
-        this.sceneLoading = false;
+        this.isLoaded = false;
+
+        this.renderPassDescriptor = null;
 
         this.mainCamera = new Camera(true);
     }
 
     async LoadResource() {
-        if(!this.sceneLoading){
-            this.objectList.forEach((object)=>{
-                object.LoadResource();
-            })
-            this.sceneLoading = true;
-        }
+        this.renderPassDescriptor = {
+            label: this.sceneName,
+            colorAttachments: [
+                {
+                    clearValue: [0.2, 0.2, 0.2, 1],
+                    loadOp: "clear",
+                    storeOp: "store",
+                },
+            ],
+        };
+
+        this.objectList.forEach(async (object) => {
+            await object.LoadResource();
+        });
+
+        this.isLoaded = true;
     }
 
     Update(deltaTime) {
-        this.objectList.forEach((object)=>{
-            object.Update(deltaTime);
+        this.objectList.forEach((object) => {
+            if(object.isLoaded){
+                object.Update(deltaTime);
+            }
         })
     }
 
-    Render(deltaTime){
-        this.objectList.forEach((object)=>{
-            object.Render(deltaTime);
+    Render(deltaTime) {
+        this.renderPassDescriptor.colorAttachments[0].view = device.getContext().getCurrentTexture().createView();
+
+        let encoder = device.getDevice().createCommandEncoder();
+        let pass = encoder.beginRenderPass(this.renderPassDescriptor);
+
+        this.objectList.forEach((object) => {
+            if(object.isLoaded){
+                object.Render(deltaTime, pass);
+            }
         })
+
+        pass.end();
+
+        let commandBuffer = encoder.finish();
+        device.getDevice().queue.submit([commandBuffer]);
     }
 
     AddObject(object) {
@@ -58,9 +85,6 @@ class SceneManager {
             }
             this.currentScene = scene;
         }
-    }
-
-    async LoadResource(){
         this.currentScene.LoadResource();
     }
 
@@ -82,11 +106,11 @@ class SceneManager {
         }
     }
 
-    CheckQuitMessage(){
+    CheckQuitMessage() {
         return this.currentScene.quitMessage;
     }
 }
 
 const sceneManager = new SceneManager();
 
-export {sceneManager}
+export { sceneManager }

@@ -6,14 +6,18 @@ export class Sprite extends Object {
         super(spriteName);
 
         this.image = null;
+        
         this.texture = null;
+        this.sampler = null;
+        this.group = [];
+        
         this.width = null;
         this.height = null;
 
         this.src = src;
     }
 
-    async LoadResource(){
+    async LoadResource() {
         super.LoadResource();
 
         this.image = await spriteManager.LoadImageToSrc(this.src);
@@ -35,6 +39,7 @@ export class Sprite extends Object {
         );
 
         this.SetRender();
+        this.isLoaded = true;
     }
 
     SetRender() {
@@ -71,6 +76,7 @@ export class Sprite extends Object {
             });
 
             let binding = device.getDevice().createBindGroup({
+                label : this.src,
                 layout: this.pipeline.getBindGroupLayout(0),
                 entries: [
                     { binding: 0, resource: this.sampler },
@@ -80,17 +86,6 @@ export class Sprite extends Object {
             });
             this.group.push(binding);
         }
-
-        this.renderPassDescriptor = {
-            label: "texture",
-            colorAttachments: [
-                {
-                    clearValue: [0.3, 0.3, 0.3, 1],
-                    loadOp: "clear",
-                    storeOp: "store",
-                },
-            ],
-        };
     }
 
     Update(deltaTime) {
@@ -104,20 +99,12 @@ export class Sprite extends Object {
         device.getDevice().queue.writeBuffer(this.uniformBuffer, 0, uniformValues);
     }
 
-    Render(deltaTime) {
-        super.Render(deltaTime);
+    Render(deltaTime, pass) {
+        super.Render(deltaTime, pass);
 
-        this.renderPassDescriptor.colorAttachments[0].view = device.getContext().getCurrentTexture().createView();
-
-        let encoder = device.getDevice().createCommandEncoder({ label: "sprite encoder" });
-        let pass = encoder.beginRenderPass(this.renderPassDescriptor);
         pass.setPipeline(this.pipeline);
         pass.setBindGroup(0, this.group[0]);
-        pass.draw(6, 1, 0 ,0);
-        pass.end();
-
-        let commandBuffer = encoder.finish();
-        device.getDevice().queue.submit([commandBuffer]);
+        pass.draw(6);
     }
 
     getSize() {

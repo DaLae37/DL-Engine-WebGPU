@@ -17,36 +17,37 @@ export class Cube extends Object {
             //  position   |  texture coordinate
             //-------------+----------------------
             // front face     select the top left image
-            -1, 1, 1, 0, 0,
-            -1, -1, 1, 0, 0.5,
-            1, 1, 1, 0.25, 0,
-            1, -1, 1, 0.25, 0.5,
+            -1, 1, 1,         0, 0,
+            -1, -1, 1,        0, 0.5,
+            1, 1, 1,          0.25, 0,
+            1, -1, 1,         0.25, 0.5,
             // right face     select the top middle image
-            1, 1, -1, 0.25, 0,
-            1, 1, 1, 0.5, 0,
-            1, -1, -1, 0.25, 0.5,
-            1, -1, 1, 0.5, 0.5,
+            1, 1, -1,         0.25, 0,
+            1, 1, 1,          0.5, 0,
+            1, -1, -1,        0.25, 0.5,
+            1, -1, 1,         0.5, 0.5,
             // back face      select to top right image
-            1, 1, -1, 0.5, 0,
-            1, -1, -1, 0.5, 0.5,
-            -1, 1, -1, 0.75, 0,
-            -1, -1, -1, 0.75, 0.5,
-            // left face       select the bottom left image
-            -1, 1, 1, 0, 0.5,
-            -1, 1, -1, 0.25, 0.5,
-            -1, -1, 1, 0, 1,
-            -1, -1, -1, 0.25, 1,
-            // bottom face     select the bottom middle image
-            1, -1, 1, 0.25, 0.5,
-            -1, -1, 1, 0.5, 0.5,
-            1, -1, -1, 0.25, 1,
-            -1, -1, -1, 0.5, 1,
-            // top face        select the bottom right image
-            -1, 1, 1, 0.5, 0.5,
-            1, 1, 1, 0.75, 0.5,
-            -1, 1, -1, 0.5, 1,
-            1, 1, -1, 0.75, 1,
+            1, 1, -1,         0.5, 0,
+            1, -1, -1,        0.5, 0.5,
+            -1, 1, -1,        0.75, 0,
+            -1, -1, -1,       0.75, 0.5,
+            // left face      select the bottom left image
+            -1, 1, 1,         0, 0.5,
+            -1, 1, -1,        0.25, 0.5,
+            -1, -1, 1,        0, 1,
+            -1, -1, -1,       0.25, 1,
+            // bottom face    select the bottom middle image
+            1, -1, 1,         0.25, 0.5,
+            -1, -1, 1,        0.5, 0.5,
+            1, -1, -1,        0.25, 1,
+            -1, -1, -1,       0.5, 1,
+            // top face       select the bottom right image
+            -1, 1, 1,         0.5, 0.5,
+            1, 1, 1,          0.75, 0.5,
+            -1, 1, -1,        0.5, 1,
+            1, 1, -1,         0.75, 1,
         ]);
+
         this.indexArray = new Uint16Array([
             0, 1, 2, 2, 1, 3,  // front
             4, 5, 6, 6, 5, 7,  // right
@@ -58,7 +59,7 @@ export class Cube extends Object {
         this.verticesSize = this.indexArray.size();
 
         this.texture = device.getDevice().createTexture({
-            label: src,
+            label: this.src,
             format: "rgba8unorm",
             size: [this.width, this.height],
             usage: GPUTextureUsage.TEXTURE_BINDING |
@@ -77,57 +78,82 @@ export class Cube extends Object {
     SetRender() {
         super.SetRender();
 
-        this.module = shaderModule.UseModule("cube");
         this.pipeline = device.getDevice().createRenderPipeline({
             label: "cube",
             layout: "auto",
             vertex: {
-                module: this.module,
+              module : this.module,
+              buffers: [
+                {
+                  arrayStride: (3 + 2) * 4, // (3+2) floats 4 bytes each
+                  attributes: [
+                    {shaderLocation: 0, offset: 0, format: 'float32x3'},  // position
+                    {shaderLocation: 1, offset: 12, format: 'float32x2'},  // texcoord
+                  ],
+                },
+              ],
             },
             fragment: {
-                module: this.module,
-                targets: [{ format: device.presentationFormat }],
+              module : this.module,
+              targets: [{ format: presentationFormat }],
+            },
+            primitive: {
+              cullMode: "back",
+            },
+            depthStencil: {
+              depthWriteEnabled: true,
+              depthCompare: "less",
+              format: "depth24plus",
             },
         });
 
-        this.uniformBufferSize =
-            2 * 4 + //translate
-            2 * 4 + //scale
-            4 * 4; //color
-        this.uniformBuffer = device.getDevice().createBuffer({
-            label: "texture",
-            size: this.uniformBufferSize,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        this.uniformBufferSize = 16 * 4;
+        this.uniformBuffer = device.createBuffer({
+          label: "cube",
+          size: this.uniformBufferSize,
+          usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
-        for (let i = 0; i < 8; ++i) {
-            this.sampler = device.getDevice().createSampler({
-                addressModeU: (i & 1) ? "repeat" : "clamp-to-edge",
-                addressModeV: (i & 2) ? "repeat" : "clamp-to-edge",
-                magFilter: (i & 4) ? "linear" : "nearest",
-            });
+        this.vertexBuffer = device.getDevice().createBuffer({
+            label: "cube vertex buffer",
+            size: this.vertexArray.byteLength,
+            usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+          });
+          device.queue.writeBuffer(this.vertexBuffer, 0, this.vertexArray);
 
-            let binding = device.getDevice().createBindGroup({
-                layout: this.pipeline.getBindGroupLayout(0),
-                entries: [
-                    { binding: 0, resource: this.sampler },
-                    { binding: 1, resource: this.texture.createView() },
-                    { binding: 2, resource: { buffer: this.uniformBuffer } }
-                ],
-            });
-            this.group.push(binding);
-        }
+        this.indexBuffer = device.getDevice().createBuffer({
+            label: "cube index buffer",
+            size: this.vertexArray.byteLength,
+            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
+          });
+          device.queue.writeBuffer(this.indexBuffer, 0, this.indexArray);
 
-        this.renderPassDescriptor = {
-            label: "texture",
-            colorAttachments: [
-                {
-                    clearValue: [0.3, 0.3, 0.3, 1],
-                    loadOp: "clear",
-                    storeOp: "store",
-                },
+        this.bindGroup = device.getDevice().createBindGroup({
+            label: "cube bindGroup",
+            layout: pipeline.getBindGroupLayout(0),
+            entries: [
+              { binding: 0, resource: { buffer: this.uniformBuffer }},
+              { binding: 1, resource: this.sampler },
+              { binding: 2, resource: this.texture.createView() },
             ],
-        };
+          });
+
+          this.renderPassDescriptor = {
+            label: 'our basic canvas renderPass',
+            colorAttachments: [
+              {
+                // view: <- to be filled out when we render
+                loadOp: 'clear',
+                storeOp: 'store',
+              },
+            ],
+            depthStencilAttachment: {
+              // view: <- to be filled out when we render
+              depthClearValue: 1.0,
+              depthLoadOp: 'clear',
+              depthStoreOp: 'store',
+            },
+          };
     }
 
 
@@ -135,10 +161,8 @@ export class Cube extends Object {
         super.Update(deltaTime);
 
         let uniformValues = new Float32Array(this.uniformBufferSize / 4);
+        let matrixValues = uniformValues.subarray(0, 16);
 
-        uniformValues.set([this.transform.position.x, this.transform.position.y], 0);
-        uniformValues.set([this.transform.scale.x, this.transform.scale.y], 2);
-        uniformValues.set([1, 1, 1, 1], 4);
         device.getDevice().queue.writeBuffer(this.uniformBuffer, 0, uniformValues);
     }
 
@@ -146,12 +170,15 @@ export class Cube extends Object {
         super.Render(deltaTime);
 
         this.renderPassDescriptor.colorAttachments[0].view = device.getContext().getCurrentTexture().createView();
+        this.renderPassDescriptor.depthStencilAttachment.view = depthTexture.createView()
 
         let encoder = device.getDevice().createCommandEncoder({ label: "sprite encoder" });
         let pass = encoder.beginRenderPass(this.renderPassDescriptor);
         pass.setPipeline(this.pipeline);
-        pass.setBindGroup(0, this.group[0]);
-        pass.draw(6, 1, 0, 0);
+        pass.setVertexBuffer(this.vertexBuffer);
+        pass.setIndexBuffer(this.indexBuffer, "uint16");
+        pass.setBindGroup(0, this.bindGroup);
+        pass.drawIndexed(this.verticesSize);
         pass.end();
 
         let commandBuffer = encoder.finish();

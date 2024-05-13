@@ -5,13 +5,10 @@ export class Object {
         this.transform = new Transform();
 
         this.name = name;
+        this.isLoaded = false;
 
         this.module = null;
         this.pipeline = null;
-
-        this.sampler = null;
-        this.group = [];
-        this.renderPassDescriptor = null;
 
         this.uniformBufferSize = 0;
         this.uniformBuffer = null;
@@ -29,7 +26,7 @@ export class Object {
 
     }
 
-    Render(deltaTime) {
+    Render(deltaTime, pass) {
 
     }
 

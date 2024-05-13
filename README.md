@@ -6,6 +6,11 @@
 
 MIT License
 
+# Used Library
+
+![assimpjs](https://github.com/kovacsv/assimpjs/blob/main/docs/images/assimpjs_logo.png)
+[assimpjs](https://github.com/kovacsv/assimpjs)
+
 # Reference
 
 [WebGPU](https://github.com/gpuweb/gpuweb)
