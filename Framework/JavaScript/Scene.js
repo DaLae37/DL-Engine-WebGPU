@@ -42,7 +42,7 @@ export class Scene {
 
         this.objectList.forEach((object) => {
             if(object.isLoaded){
-                object.Update(deltaTime);
+                object.Update(deltaTime, this.cameraMatrix);
             }
         })
     }
@@ -55,7 +55,7 @@ export class Scene {
 
         this.objectList.forEach((object) => {
             if(object.isLoaded){
-                object.Render(deltaTime, pass, this.cameraMatrix);
+                object.Render(deltaTime, pass);
             }
         })
 

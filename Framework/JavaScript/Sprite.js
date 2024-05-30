@@ -126,4 +126,4 @@ class SpriteManager extends ObjectManager {
     }
 }
 
-const spriteManager = new SpriteManager();
+export const spriteManager = new SpriteManager();

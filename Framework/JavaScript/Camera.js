@@ -12,17 +12,17 @@ export class Camera {
         this.right = new Vector3();
         this.forward = new Vector3();
 
-        this.eye = new Vector3(0, 1, -5);
-        this.at = new Vector3(0, 1, 0);
+        this.eye = new Vector3(0, 1, 5);
+        this.at = new Vector3(0, 0, 0);
         this.up = new Vector3(0, 1, 0);
 
-        this.fieldOfView = 0;
+        this.fieldOfView = 45 * Math.PI / 180;
         this.pitch = 0;
         this.yaw = 0;
     }
 
     Update(deltaTime) {
-        this.projectionMatrix = this.perspective(this.fieldOfView, canvas.WIDTH / canvas.HEIGHT, 1, 1000);
+        this.projectionMatrix = this.perspective(this.fieldOfView, canvas.WIDTH / canvas.HEIGHT, 0.1, 1);
         this.viewMatrix = Matrix4.inverse(this.look(this.eye, this.at, this.up));
         this.cameraMatrix = Matrix4.multiply(this.projectionMatrix, this.viewMatrix);
     }
@@ -67,6 +67,9 @@ export class Camera {
 
     perspective(radianFOV, aspect, zNear, zFar) {
         let matrix = Array.from(Array(4), () => new Float32Array(4).fill(0));
+
+        radianFOV = Math.tan(Math.PI * 0.5 - 0.5 * radianFOV);
+
         matrix[0][0] = radianFOV / aspect;
         matrix[0][1] = 0;
         matrix[0][2] = 0;

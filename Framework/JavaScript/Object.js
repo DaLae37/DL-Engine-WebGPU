@@ -1,4 +1,4 @@
-import { Transform } from "./Tool.js"
+import { Transform, Matrix4 } from "./Tool.js"
 
 export class Object {
     constructor(name) {
@@ -12,6 +12,7 @@ export class Object {
 
         this.uniformBufferSize = 0;
         this.uniformBuffer = null;
+        this.worldMatrix = Matrix4.identity();
     }
     
     async LoadResource(){
@@ -22,11 +23,11 @@ export class Object {
 
     }
 
-    Update(deltaTime) {
+    Update(deltaTime, cameraMatrix = Matrix4.identity()) {
 
     }
 
-    Render(deltaTime, pass, cameraMatrix) {
+    Render(deltaTime, pass = null) {
 
     }
 
@@ -34,6 +35,8 @@ export class Object {
         this.transform.position.x += position.x;
         this.transform.position.y += position.y;
         this.transform.position.z += position.z;
+
+        Transform.translate(this.worldMatrix, this.transform.position)
     }
 
     setPosition(position) {
