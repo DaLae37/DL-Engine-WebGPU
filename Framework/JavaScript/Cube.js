@@ -166,7 +166,7 @@ export class Cube extends Object {
         device.getDevice().queue.writeBuffer(this.uniformBuffer, 0, uniformValues);
     }
 
-    Render(deltaTime) {
+    Render(deltaTime, pass, cameraMatrix) {
         super.Render(deltaTime);
 
         this.renderPassDescriptor.colorAttachments[0].view = device.getContext().getCurrentTexture().createView();

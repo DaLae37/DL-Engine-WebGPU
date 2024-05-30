@@ -26,7 +26,7 @@ export class Object {
 
     }
 
-    Render(deltaTime, pass) {
+    Render(deltaTime, pass, cameraMatrix) {
 
     }
 

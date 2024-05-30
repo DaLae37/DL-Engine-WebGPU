@@ -1,5 +1,6 @@
 import { Camera } from "./Camera.js"
 import { device } from "./Core.js";
+import { Matrix4 } from "./Tool.js";
 
 export class Scene {
     constructor(sceneName) {
@@ -12,7 +13,8 @@ export class Scene {
 
         this.renderPassDescriptor = null;
 
-        this.mainCamera = new Camera(true);
+        this.camera = new Camera();
+        this.cameraMatrix = new Matrix4();
     }
 
     async LoadResource() {
@@ -35,6 +37,9 @@ export class Scene {
     }
 
     Update(deltaTime) {
+        this.camera.Update(deltaTime);
+        this.cameraMatrix = this.camera.getCameraMatrix();
+
         this.objectList.forEach((object) => {
             if(object.isLoaded){
                 object.Update(deltaTime);
@@ -50,7 +55,7 @@ export class Scene {
 
         this.objectList.forEach((object) => {
             if(object.isLoaded){
-                object.Render(deltaTime, pass);
+                object.Render(deltaTime, pass, this.cameraMatrix);
             }
         })
 

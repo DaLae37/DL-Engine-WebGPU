@@ -1,7 +1,7 @@
 import { Object } from "./Object.js";
 
 export class Model extends Object {
-    constructor(src, spriteName = "null") {
+    constructor(modelSrc, textureSrc = "null", spriteName = "null") {
         super(spriteName);
 
         this.model = null;
@@ -10,7 +10,9 @@ export class Model extends Object {
 
         this.texture = null;
 
-        this.src = src;
+        this.modelSrc = modelSrc;
+        this.textureSrc = textureSrc;
+
     }
 
     async LoadResource() {
@@ -18,8 +20,12 @@ export class Model extends Object {
 
         await assimpjs().then((ajs) => {
             let files = [
-                this.src,
+                this.modelSrc,
             ];
+            if(this.textureSrc != "null"){
+                files.push(this.textureSrc);
+            }
+
             Promise.all(files.map((file) => fetch(file))).then((responses) => {
                 return Promise.all(responses.map((res) => res.arrayBuffer()));
             }).then((arrayBuffers) => {
@@ -27,7 +33,6 @@ export class Model extends Object {
                 for (let i = 0; i < files.length; i++) {
                     fileList.AddFile(files[i], new Uint8Array(arrayBuffers[i]));
                 }
-
                 let result = ajs.ConvertFileList(fileList, "assjson");
 
                 if (!result.IsSuccess() || result.FileCount() == 0) {
@@ -47,8 +52,7 @@ export class Model extends Object {
     }
 
     SetRender() {
-        this.meshes = this.model.meshes;
-        this.meshCount = this.meshes.length;
+
         console.log(this.model)
     }
 
@@ -59,4 +63,20 @@ export class Model extends Object {
     Render(deltaTime) {
         super.Render(deltaTime);
     }
+}
+
+class GLTFBufferView {
+
+}
+
+class GLTFAccessor {
+
+}
+
+class GLTFPrimitive {
+
+}
+
+class GLTFMesh {
+
 }
