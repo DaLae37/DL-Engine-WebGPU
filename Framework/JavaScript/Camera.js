@@ -3,8 +3,6 @@ import { canvas } from "./Core.js"
 
 export class Camera {
     constructor() {
-        this.position = new Vector3();
-
         this.cameraMatrix = new Matrix4();
         this.projectionMatrix = new Matrix4();
         this.viewMatrix = new Matrix4();
@@ -12,19 +10,19 @@ export class Camera {
         this.right = new Vector3();
         this.forward = new Vector3();
 
-        this.eye = new Vector3(0, 1, 5);
+        this.eye = new Vector3(0, 0, 10);
         this.at = new Vector3(0, 0, 0);
         this.up = new Vector3(0, 1, 0);
 
-        this.fieldOfView = 45 * Math.PI / 180;
+        this.fieldOfView = 60 * Math.PI / 180;
         this.pitch = 0;
         this.yaw = 0;
     }
 
     Update(deltaTime) {
-        this.projectionMatrix = this.perspective(this.fieldOfView, canvas.WIDTH / canvas.HEIGHT, 0.1, 1);
+        this.projectionMatrix = this.perspective(this.fieldOfView, canvas.getCanvas().clientWidth / canvas.getCanvas().clientHeight, 1, 100);
         this.viewMatrix = Matrix4.inverse(this.look(this.eye, this.at, this.up));
-        this.cameraMatrix = Matrix4.multiply(this.projectionMatrix, this.viewMatrix);
+        this.cameraMatrix = Matrix4.multiply(this.viewMatrix, this.projectionMatrix);
     }
 
     getCameraMatrix(){
@@ -117,5 +115,13 @@ export class Camera {
         matrix[3][3] = 1;
 
         return matrix
+    }
+
+    setPosition(position){
+        this.eye = position;
+    }
+
+    Translate(offset){
+        this.eye = Vector3.add(this.eye, offset);
     }
 }

@@ -5,9 +5,11 @@ import { inputManager } from "./Input.js";
 export class Engine {
     constructor() {
         this.FPS = 60;
-        
+
         this.currentTime = 0;
         this.previousTime = 0;
+
+        this.observer = null;
     }
 
     async Init() {
@@ -17,7 +19,8 @@ export class Engine {
         shaderModule.SetShader();
 
         inputManager.Init();
-        
+
+        this.InitObserver();
         this.InitDeltaTime();
     }
 
@@ -26,7 +29,7 @@ export class Engine {
 
         const mainLoop = setInterval(() => {
             inputManager.UpdateKeyState();
-            if(sceneManager.currentScene.isLoaded){
+            if (sceneManager.currentScene.isLoaded) {
                 sceneManager.UpdateScene(this.getDeltaTime());
                 sceneManager.RenderScene(this.getDeltaTime());
             }
@@ -43,6 +46,19 @@ export class Engine {
         this.previousTime = this.currentTime;
 
         return deltaTime / 1000;
+    }
+
+    InitObserver() {
+        this.observer = new ResizeObserver(entries => {
+            for (const entry of entries) {
+                const canvas = entry.target;
+                const width = entry.contentBoxSize[0].inlineSize;
+                const height = entry.contentBoxSize[0].blockSize;
+                canvas.width = Math.max(1, Math.min(width, device.getDevice().limits.maxTextureDimension2D));
+                canvas.height = Math.max(1, Math.min(height, device.getDevice().limits.maxTextureDimension2D));
+            }
+        });
+        this.observer.observe(canvas.getCanvas());
     }
 
     InitDeltaTime() {

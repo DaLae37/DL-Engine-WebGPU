@@ -99,7 +99,7 @@ export class Sprite extends Object {
         device.getDevice().queue.writeBuffer(this.uniformBuffer, 0, uniformValues);
     }
 
-    Render(deltaTime, pass, cameraMatrix) {
+    Render(deltaTime, pass) {
         super.Render(deltaTime, pass);
 
         pass.setPipeline(this.pipeline);

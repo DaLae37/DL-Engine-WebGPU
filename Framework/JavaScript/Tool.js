@@ -437,8 +437,8 @@ export class Transform {
 
     static rotate(matrix, radians) { //radians : Vector3
         let x = Matrix4.multiply(matrix, Matrix4.rotationX(radians.x));
-        let y = Matrix4.multiply(x, Matrix4.rotationX(radians.y));
-        let z = Matrix4.multiply(y, Matrix4.rotationX(radians.z));
+        let y = Matrix4.multiply(x, Matrix4.rotationY(radians.y));
+        let z = Matrix4.multiply(y, Matrix4.rotationZ(radians.z));
 
         return z;
     }

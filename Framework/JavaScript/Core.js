@@ -56,15 +56,12 @@ class Device {
     }
 
     InitContext() {
-        let devicePixelRatio = window.devicePixelRatio || 1;
-        let presentationSize = [canvas.getCanvas().clientWidth * devicePixelRatio, canvas.getCanvas().clientHeight * devicePixelRatio];
         this.presentationFormat = this.gpu.getPreferredCanvasFormat();
 
         this.context = canvas.getCanvas().getContext("webgpu");
         this.context.configure({
             device: this.device,
             format: this.presentationFormat,
-            size: presentationSize,
             alphamode : "premultiplied"
         });
     }

@@ -9,8 +9,10 @@ export class Object {
 
         this.module = null;
         this.pipeline = null;
+        this.bindGroup = null;
+        this.renderPassDescriptor = null;
 
-        this.uniformBufferSize = 0;
+        this.uniformBufferSize = 4 * 4 * 4;
         this.uniformBuffer = null;
         this.worldMatrix = Matrix4.identity();
     }
@@ -27,7 +29,7 @@ export class Object {
 
     }
 
-    Render(deltaTime, pass = null) {
+    Render(deltaTime, encoder = null) {
 
     }
 
@@ -36,31 +38,23 @@ export class Object {
         this.transform.position.y += position.y;
         this.transform.position.z += position.z;
 
-        Transform.translate(this.worldMatrix, this.transform.position)
+        this.worldMatrix = Transform.translate(this.worldMatrix, this.transform.position);
     }
 
-    setPosition(position) {
-        this.transform.position = position;
+    Scaling(scale){
+        this.transform.scale.x += scale.x;
+        this.transform.scale.y += scale.y;
+        this.transform.scale.z += scale.z;
+
+        this.worldMatrix = Transform.scale(this.worldMatrix, this.transform.scale);
     }
 
-    setScale(scale) {
-        this.transform.scale = scale;
-    }
+    Rotate(radians){
+        this.transform.rotation.x += radians.x;
+        this.transform.rotation.y += radians.y;
+        this.transform.rotation.z += radians.z;
 
-    setRotation(rotation) {
-        this.transform.rotation = rotation;
-    }
-
-    getPosition() {
-        return this.transform.position;
-    }
-
-    getScale() {
-        return this.transform.scale;
-    }
-
-    getRotation() {
-        return this.transform.rotation;
+        this.worldMatrix = Transform.rotate(this.worldMatrix, this.transform.rotation);
     }
 }
 

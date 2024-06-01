@@ -11,24 +11,11 @@ export class Scene {
 
         this.isLoaded = false;
 
-        this.renderPassDescriptor = null;
-
         this.camera = new Camera();
         this.cameraMatrix = new Matrix4();
     }
 
     async LoadResource() {
-        this.renderPassDescriptor = {
-            label: this.sceneName,
-            colorAttachments: [
-                {
-                    clearValue: [0.2, 0.2, 0.2, 1],
-                    loadOp: "clear",
-                    storeOp: "store",
-                },
-            ],
-        };
-
         this.objectList.forEach(async (object) => {
             await object.LoadResource();
         });
@@ -48,18 +35,13 @@ export class Scene {
     }
 
     Render(deltaTime) {
-        this.renderPassDescriptor.colorAttachments[0].view = device.getContext().getCurrentTexture().createView();
-
         let encoder = device.getDevice().createCommandEncoder();
-        let pass = encoder.beginRenderPass(this.renderPassDescriptor);
 
         this.objectList.forEach((object) => {
             if(object.isLoaded){
-                object.Render(deltaTime, pass);
+                object.Render(deltaTime, encoder);
             }
         })
-
-        pass.end();
 
         let commandBuffer = encoder.finish();
         device.getDevice().queue.submit([commandBuffer]);
