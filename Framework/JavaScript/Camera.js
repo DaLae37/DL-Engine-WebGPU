@@ -1,11 +1,12 @@
-import { Matrix4, Vector3, Vector4 } from "./Tool.js"
+import { Matrix4, Transform, Vector3 } from "./Tool.js"
 import { canvas } from "./Core.js"
 
 export class Camera {
     constructor() {
-        this.cameraMatrix = new Matrix4();
         this.projectionMatrix = new Matrix4();
+        this.matrix = new Matrix4();
         this.viewMatrix = new Matrix4();
+        this.cameraMatrix = new Matrix4();
 
         this.right = new Vector3();
         this.forward = new Vector3();
@@ -14,14 +15,17 @@ export class Camera {
         this.at = new Vector3(0, 0, 0);
         this.up = new Vector3(0, 1, 0);
 
-        this.fieldOfView = 60 * Math.PI / 180;
+        this.fieldOfView = Transform.degreeTOradian(90);
         this.pitch = 0;
         this.yaw = 0;
     }
 
     Update(deltaTime) {
         this.projectionMatrix = this.perspective(this.fieldOfView, canvas.getCanvas().clientWidth / canvas.getCanvas().clientHeight, 1, 100);
-        this.viewMatrix = Matrix4.inverse(this.look(this.eye, this.at, this.up));
+
+        this.matrix = this.look(this.eye, this.at, this.up);
+        this.viewMatrix = Matrix4.inverse(this.matrix);
+
         this.cameraMatrix = Matrix4.multiply(this.viewMatrix, this.projectionMatrix);
     }
 
@@ -117,11 +121,25 @@ export class Camera {
         return matrix
     }
 
-    setPosition(position){
-        this.eye = position;
+    SetFeildOfView(degree){
+        this.fieldOfView = Transform.degreeTOradian(degree);
+    }
+
+    SetPosition(position){
+        this.position = position;
+    }
+
+    SetRotation(rotation){
+        
     }
 
     Translate(offset){
         this.eye = Vector3.add(this.eye, offset);
+    }
+
+    Rotate(degeres){
+        console.log(this.matrix)
+        this.matrix = Matrix4.rotationX(Matrix4.rotationY(degeres.x), degeres.y);
+        console.log(this.matrix)
     }
 }

@@ -22,3 +22,7 @@ export const cubeShader = `
     return fragPosition;
   }
 `
+
+export const textureCubeShader = `
+
+`

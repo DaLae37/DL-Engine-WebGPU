@@ -1,7 +1,6 @@
 import { Object } from "./Object.js";
-import { device, canvas, shaderModule } from "./Core.js";
+import { device, shaderModule } from "./Core.js";
 import { Matrix4 } from "./Tool.js";
-import { spriteManager } from "./Sprite.js"
 
 export class Cube extends Object {
   constructor(cubeName = "null") {
@@ -20,9 +19,7 @@ export class Cube extends Object {
 
     this.vertexArray = null;
     this.vertexLength = 36;
-
     this.vertexBuffer = null;
-    this.depthTexture = null;
   }
 
   async LoadResource() {
@@ -159,69 +156,19 @@ export class Cube extends Object {
       0, 1,
       1, 0,
     ]);
-    let dataIndex = 0;
+
     this.vertexArray = new Float32Array(this.oneVertexLength * this.vertexLength);
-    for (let i = 0; i < this.oneVertexLength * this.vertexLength; i += this.oneVertexLength) {
-      this.vertexArray.set(this.positionArray.subarray(i, i + this.positionArrayLength), dataIndex);
-      dataIndex += this.positionArrayLength;
-
-      this.vertexArray.set(this.colorArray.subarray(i, i + this.colorArrayLength), dataIndex);
-      dataIndex += this.colorArrayLength;
-
-      this.vertexArray.set(this.uvArray.subarray(i, i + this.uvArrayLength), dataIndex);
-      dataIndex += this.uvArrayLength;
+    for (let i = 0; i < this.vertexLength; i++) {
+      this.vertexArray.set(this.positionArray.subarray(i * this.positionArrayLength, i * this.positionArrayLength + this.positionArrayLength), i * this.oneVertexLength + this.positionOffset / 4);
+      this.vertexArray.set(this.colorArray.subarray(i * this.colorArrayLength, i * this.colorArrayLength + this.colorArrayLength), i * this.oneVertexLength + this.colorOffset / 4);
+      this.vertexArray.set(this.uvArray.subarray(i * this.uvArrayLength, i * this.uvArrayLength + this.uvArrayLength), i * this.oneVertexLength + this.uvOffset / 4);
     }
 
-    this.vertexArray = new Float32Array([
-      // float4 position, float4 color, float2 uv,
-      1, -1, 1, 1,   1, 0, 1, 1,  0, 1,
-      -1, -1, 1, 1,  0, 0, 1, 1,  1, 1,
-      -1, -1, -1, 1, 0, 0, 0, 1,  1, 0,
-      1, -1, -1, 1,  1, 0, 0, 1,  0, 0,
-      1, -1, 1, 1,   1, 0, 1, 1,  0, 1,
-      -1, -1, -1, 1, 0, 0, 0, 1,  1, 0,
-    
-      1, 1, 1, 1,    1, 1, 1, 1,  0, 1,
-      1, -1, 1, 1,   1, 0, 1, 1,  1, 1,
-      1, -1, -1, 1,  1, 0, 0, 1,  1, 0,
-      1, 1, -1, 1,   1, 1, 0, 1,  0, 0,
-      1, 1, 1, 1,    1, 1, 1, 1,  0, 1,
-      1, -1, -1, 1,  1, 0, 0, 1,  1, 0,
-    
-      -1, 1, 1, 1,   0, 1, 1, 1,  0, 1,
-      1, 1, 1, 1,    1, 1, 1, 1,  1, 1,
-      1, 1, -1, 1,   1, 1, 0, 1,  1, 0,
-      -1, 1, -1, 1,  0, 1, 0, 1,  0, 0,
-      -1, 1, 1, 1,   0, 1, 1, 1,  0, 1,
-      1, 1, -1, 1,   1, 1, 0, 1,  1, 0,
-    
-      -1, -1, 1, 1,  0, 0, 1, 1,  0, 1,
-      -1, 1, 1, 1,   0, 1, 1, 1,  1, 1,
-      -1, 1, -1, 1,  0, 1, 0, 1,  1, 0,
-      -1, -1, -1, 1, 0, 0, 0, 1,  0, 0,
-      -1, -1, 1, 1,  0, 0, 1, 1,  0, 1,
-      -1, 1, -1, 1,  0, 1, 0, 1,  1, 0,
-    
-      1, 1, 1, 1,    1, 1, 1, 1,  0, 1,
-      -1, 1, 1, 1,   0, 1, 1, 1,  1, 1,
-      -1, -1, 1, 1,  0, 0, 1, 1,  1, 0,
-      -1, -1, 1, 1,  0, 0, 1, 1,  1, 0,
-      1, -1, 1, 1,   1, 0, 1, 1,  0, 0,
-      1, 1, 1, 1,    1, 1, 1, 1,  0, 1,
-    
-      1, -1, -1, 1,  1, 0, 0, 1,  0, 1,
-      -1, -1, -1, 1, 0, 0, 0, 1,  1, 1,
-      -1, 1, -1, 1,  0, 1, 0, 1,  1, 0,
-      1, 1, -1, 1,   1, 1, 0, 1,  0, 0,
-      1, -1, -1, 1,  1, 0, 0, 1,  0, 1,
-      -1, 1, -1, 1,  0, 1, 0, 1,  1, 0,
-    ]);
-
-    this.SetRender();
+    this.SetRenderer();
     this.isLoaded = true;
   }
-  SetRender() {
-    super.SetRender();
+  SetRenderer() {
+    super.SetRenderer();
 
     this.pipeline = device.getDevice().createRenderPipeline({
       layout: "auto",
@@ -275,14 +222,9 @@ export class Cube extends Object {
     this.vertexBuffer.unmap();
 
     this.uniformBuffer = device.getDevice().createBuffer({
+      label: this.cubeName,
       size: this.uniformBufferSize,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-    });
-
-    this.depthTexture = device.getDevice().createTexture({
-      size: [canvas.getCanvas().width, canvas.getCanvas().height],
-      format: "depth24plus",
-      usage: GPUTextureUsage.RENDER_ATTACHMENT,
     });
 
     this.bindGroup = device.getDevice().createBindGroup({
@@ -297,21 +239,6 @@ export class Cube extends Object {
         },
       ],
     });
-
-    this.renderPassDescriptor = {
-      colorAttachments: [
-        {
-          clearValue: [1.0, 1.0, 1.0, 1.0],
-          loadOp: "clear",
-          storeOp: "store",
-        },
-      ],
-      depthStencilAttachment: {
-        depthClearValue: 1.0,
-        depthLoadOp: "clear",
-        depthStoreOp: "store",
-      },
-    };
   }
 
 
@@ -325,30 +252,14 @@ export class Cube extends Object {
         this.uniformArray[i * 4 + j] = matrix[i][j];
       }
     }
+    device.getDevice().queue.writeBuffer(this.uniformBuffer, 0, this.uniformArray);
   }
 
-  Render(deltaTime, encoder) {
+  Render(deltaTime, pass) {
     super.Render(deltaTime);
-
-    let canvasTexture = device.getContext().getCurrentTexture();
-    this.renderPassDescriptor.colorAttachments[0].view = canvasTexture.createView();
-    if (this.depthTexture.width !== canvasTexture.width || this.depthTexture.height !== canvasTexture.height) {
-      if (this.depthTexture) {
-        this.depthTexture.destroy();
-      }
-      this.depthTexture = device.getDevice().createTexture({
-        size: [canvasTexture.width, canvasTexture.height],
-        format: "depth24plus",
-        usage: GPUTextureUsage.RENDER_ATTACHMENT,
-      });
-    }
-    this.renderPassDescriptor.depthStencilAttachment.view = this.depthTexture.createView();
-    device.getDevice().queue.writeBuffer(this.uniformBuffer, 0, this.uniformArray.buffer, this.uniformArray.byteOffset, this.uniformArray.byteLength);
-    let pass = encoder.beginRenderPass(this.renderPassDescriptor);
     pass.setPipeline(this.pipeline);
     pass.setVertexBuffer(0, this.vertexBuffer);
     pass.setBindGroup(0, this.bindGroup);
     pass.draw(this.vertexLength);
-    pass.end();
   }
 }

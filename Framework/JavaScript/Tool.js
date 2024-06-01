@@ -427,6 +427,11 @@ export class Transform {
         this.rotation = new Vector3(0, 0, 0);
     }
 
+    static degreeTOradian(degree){
+        let radian = degree * (Math.PI / 180);
+        return radian;
+    }
+
     static translate(matrix, offset) { //offset : Vector3
         return Matrix4.multiply(matrix, Matrix4.translation(offset));
     }

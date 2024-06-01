@@ -83,7 +83,7 @@ class Device {
     }
 }
 
-import { cubeShader } from "../Shader/cube.js";
+import { cubeShader, textureCubeShader } from "../Shader/cube.js";
 import { textureShader } from "../Shader/texture.js"
 
 class ShaderModule {
@@ -96,6 +96,7 @@ class ShaderModule {
         if (device.getDevice()) { //Add Using Shaders
             this.shaderDictionary["texture"] = textureShader;
             this.shaderDictionary["cube"] = cubeShader;
+            this.shaderDictionary["textureShader"] = textureCubeShader;
             //this.shaderDictionary["label"] = shader;
         }
         else {
@@ -116,7 +117,7 @@ class ShaderModule {
         if (!(label in this.moduleDictionary) && label in this.shaderDictionary) {
             this.moduleDictionary[label] = device.getDevice().createShaderModule({
                 label: label,
-                code: this.shaderDictionary[label]
+                code: this.shaderDictionary[label],
             });
         }
         else {

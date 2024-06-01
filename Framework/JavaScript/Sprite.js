@@ -119,11 +119,3 @@ export class Sprite extends Object {
         this.height = height;
     }
 }
-
-class SpriteManager extends ObjectManager {
-    constructor() {
-        super();
-    }
-}
-
-export const spriteManager = new SpriteManager();
