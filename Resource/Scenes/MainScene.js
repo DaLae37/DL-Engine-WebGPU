@@ -1,6 +1,6 @@
 import { Scene } from "../../Framework/JavaScript/Scene.js";
 import { Cube } from "../../Framework/JavaScript/Cube.js";
-import { Vector3 } from "../../Framework/JavaScript/Tool.js";
+import { color, Vector3, Vector4 } from "../../Framework/JavaScript/Tool.js";
 import { inputManager } from "../../Framework/JavaScript/Input.js";
 
 export class MainScene extends Scene {
@@ -11,7 +11,7 @@ export class MainScene extends Scene {
         this.cube2 = new Cube("cube2");
         this.AddObject(this.cube1);
         this.AddObject(this.cube2);
-
+        
         this.cube1.SetRotation(new Vector3(45, 0, 0));
         this.cube1.SetScale(new Vector3(2, 2, 2));
         this.cube2.SetPosition(new Vector3(-5, 0, 0));
@@ -19,7 +19,8 @@ export class MainScene extends Scene {
 
     Update(deltaTime) {
         super.Update(deltaTime);
-        this.cube1.Translate(new Vector3(deltaTime, 0, 0));
+        
+        this.cube1.Rotate(new Vector3(deltaTime * 45, 0, 0));
         if (inputManager.GetKeyDown("KeyA")) {
             this.cube2.Translate(new Vector3(-5 * deltaTime));
         }

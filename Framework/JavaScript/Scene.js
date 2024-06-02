@@ -12,6 +12,8 @@ export class Scene {
 
         this.camera = new Camera();
         this.cameraMatrix = new Matrix4();
+
+        this.lightList = [] //Array;
     }
 
     async LoadResource() {
@@ -46,7 +48,17 @@ export class Scene {
     }
 
     DeleteObject(object) {
+        let index = this.objectList.findIndex((findObject) => findObject === object);
+        this.objectList.splice(index, index + 1);
+    }
 
+    AddLight(light) {
+        this.lightList.push(light);
+    }
+
+    DeleteLight(light) {
+        let index = this.lightList.findIndex((findLight) => findLight === light);
+        this.lightList.splice(index, index + 1);
     }
 }
 

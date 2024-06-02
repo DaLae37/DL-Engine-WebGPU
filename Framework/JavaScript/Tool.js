@@ -151,7 +151,7 @@ export class Matrix4 {
                 }
             }
         }
-    
+
         return matrix;
     }
 
@@ -427,7 +427,7 @@ export class Transform {
         this.rotation = new Vector3(0, 0, 0);
     }
 
-    static degreeTOradian(degree){
+    static degreeTOradian(degree) {
         let radian = degree * (Math.PI / 180);
         return radian;
     }
@@ -448,3 +448,24 @@ export class Transform {
         return z;
     }
 }
+
+class Color {
+    constructor() {
+        this.colorDictionary = {} //Dictionary
+        this.colorDictionary["white"] = [1, 1, 1, 1];
+        this.colorDictionary["black"] = [0, 0, 0, 1];
+        this.colorDictionary["red"] = [1, 0, 0, 1];
+        this.colorDictionary["green"] = [0, 1, 0, 1];
+        this.colorDictionary["blue"] = [0, 0, 1, 1];
+    }
+
+    GetColorName(colorCode) {
+        return Object.keys(this.colorDictionary).filter(key => this.colorDictionary[key] === colorCode).toString();
+    }
+
+    GetColorCode(colorName) {
+        return this.colorDictionary[colorName];
+    }
+}
+
+export const color = new Color();
