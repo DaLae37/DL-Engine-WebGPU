@@ -1,6 +1,6 @@
 import { Object } from "./Object.js";
 import { device, shaderModule } from "./Core.js";
-import { Matrix4, color } from "./Tool.js";
+import { Matrix3, Matrix4, Vector3, color } from "./Tool.js";
 
 export class Cube extends Object {
   constructor(cubeName = "null") {
@@ -18,8 +18,12 @@ export class Cube extends Object {
     this.uvArray = null;
     this.uvOffset = 8 * 4;
     this.uvArrayLength = 2;
-    
-    this.oneVertexLength = this.positionArrayLength + this.colorArrayLength + this.uvArrayLength;
+
+    this.normalArray = null;
+    this.normalOffset = 10 * 4;
+    this.normalArrayLength = 3;
+
+    this.oneVertexLength = this.positionArrayLength + this.colorArrayLength + this.uvArrayLength + this.normalArrayLength;
 
     this.vertexArray = null;
     this.vertexLength = 36;
@@ -167,11 +171,62 @@ export class Cube extends Object {
       1, 0,
     ]);
 
+    this.normalArray = new Float32Array([
+      //Bottom
+      0, -1, 0,
+      0, -1, 0,
+      0, -1, 0,
+      0, -1, 0,
+      0, -1, 0,
+      0, -1, 0,
+
+      //Right
+      1, 0, 0,
+      1, 0, 0,
+      1, 0, 0,
+      1, 0, 0,
+      1, 0, 0,
+      1, 0, 0,
+
+      //Top
+      0, 1, 0,
+      0, 1, 0,
+      0, 1, 0,
+      0, 1, 0,
+      0, 1, 0,
+      0, 1, 0,
+
+      //Left
+      -1, 0, 0,
+      -1, 0, 0,
+      -1, 0, 0,
+      -1, 0, 0,
+      -1, 0, 0,
+      -1, 0, 0,
+
+      //Front
+      0, 0, 1,
+      0, 0, 1,
+      0, 0, 1,
+      0, 0, 1,
+      0, 0, 1,
+      0, 0, 1,
+
+      //Back           
+      0, 0, -1,
+      0, 0, -1,
+      0, 0, -1,
+      0, 0, -1,
+      0, 0, -1,
+      0, 0, -1,
+    ]);
+
     this.vertexArray = new Float32Array(this.oneVertexLength * this.vertexLength);
     for (let i = 0; i < this.vertexLength; i++) {
       this.vertexArray.set(this.positionArray.subarray(i * this.positionArrayLength, i * this.positionArrayLength + this.positionArrayLength), i * this.oneVertexLength + this.positionOffset / 4);
       this.vertexArray.set(this.colorArray.subarray(i * this.colorArrayLength, i * this.colorArrayLength + this.colorArrayLength), i * this.oneVertexLength + this.colorOffset / 4);
       this.vertexArray.set(this.uvArray.subarray(i * this.uvArrayLength, i * this.uvArrayLength + this.uvArrayLength), i * this.oneVertexLength + this.uvOffset / 4);
+      this.vertexArray.set(this.normalArray.subarray(i * this.normalArrayLength, i * this.normalArrayLength + this.normalArrayLength), i * this.oneVertexLength + this.normalOffset / 4);
     }
 
     this.indexArray = new Uint16Array([
@@ -221,6 +276,12 @@ export class Cube extends Object {
                 offset: this.uvOffset,
                 format: "float32x2",
               },
+              {
+                //normal
+                shaderLocation: 3,
+                offset: this.normalOffset,
+                format: "float32x3",
+              },
             ],
           },
         ],
@@ -256,12 +317,24 @@ export class Cube extends Object {
     });
     device.getDevice().queue.writeBuffer(this.indexBuffer, 0, this.indexArray);
 
-
+    this.uniformBufferSize = (4 * 4 + 4 * 4) * 4;
     this.uniformBuffer = device.getDevice().createBuffer({
       label: this.cubeName,
       size: this.uniformBufferSize,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
+
+    this.lightBufferSize = 4 * 4;
+    this.lightBuffer = device.getDevice().createBuffer({
+      label: this.cubeName,
+      size: this.lightBufferSize,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
+    this.lightArray = new Float32Array(3);
+    this.lightArray[0] = Vector3.normalize(new Vector3(-0.5, -0.7, -1)).x;
+    this.lightArray[1] = Vector3.normalize(new Vector3(-0.5, -0.7, -1)).y;
+    this.lightArray[2] = Vector3.normalize(new Vector3(-0.5, -0.7, -1)).z;
+    device.getDevice().queue.writeBuffer(this.lightBuffer, 0, this.lightArray);
 
     this.bindGroup = device.getDevice().createBindGroup({
       layout: this.pipeline.getBindGroupLayout(0),
@@ -271,7 +344,14 @@ export class Cube extends Object {
           resource: {
             buffer: this.uniformBuffer,
             size: this.uniformBufferSize,
-          },
+          }
+        },
+        {
+          binding: 1,
+          resource: {
+            buffer: this.lightBuffer,
+            size: this.lightBufferSize,
+          }
         },
       ],
     });
@@ -281,12 +361,17 @@ export class Cube extends Object {
   Update(deltaTime, cameraMatrix) {
     super.Update(deltaTime);
 
-    let matrix = Matrix4.multiply(this.worldMatrix, cameraMatrix);
+    let worldMatrix = Matrix4.multiply(this.worldMatrix, cameraMatrix);
+    let normalMatrix = Matrix3.Mat4toMat3(Matrix4.inverse(this.worldMatrix));
     this.uniformArray = new Float32Array(this.uniformBufferSize / 4);
-    for (let i = 0; i < this.uniformBufferSize / 4 / 4; i++) {
-      for (let j = 0; j < this.uniformBufferSize / 4 / 4; j++) {
-        this.uniformArray[i * 4 + j] = matrix[i][j];
-      }
+    let index = 0;
+    for (let i = 0; i < 4 * 4; i++) {
+      this.uniformArray[i] = worldMatrix[Math.floor(i / 4)][Math.floor(i % 4)];
+      index += 1;
+    }
+    for (let i = 0; i < 3 * 3; i++) {
+      this.uniformArray[i] = normalMatrix[Math.floor(i / 3)][Math.floor(i % 3)];
+      index += 1;
     }
     device.getDevice().queue.writeBuffer(this.uniformBuffer, 0, this.uniformArray);
   }
@@ -308,7 +393,7 @@ export class Cube extends Object {
     }
     this.color = color;
 
-    if(this.vertexArray != null){
+    if (this.vertexArray != null) {
       for (let i = 0; i < this.vertexLength; i++) {
         this.vertexArray.set(this.colorArray.subarray(i * this.colorArrayLength, i * this.colorArrayLength + this.colorArrayLength), i * this.oneVertexLength + this.colorOffset / 4);
       }
@@ -316,7 +401,7 @@ export class Cube extends Object {
     }
   }
 
-  GetColor(){
+  GetColor() {
     return color.GetColorName(this.color);
   }
 }

@@ -12,7 +12,7 @@ export class Object {
         this.bindGroup = null;
         this.renderPassDescriptor = null;
 
-        this.uniformBufferSize = 4 * 4 * 4;
+        this.uniformBufferSize = 0;
         this.uniformBuffer = null;
         this.worldMatrix = Matrix4.identity();
     }

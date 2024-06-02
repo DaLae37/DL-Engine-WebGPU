@@ -108,6 +108,24 @@ export class Matrix3 {
     constructor() {
         this.matrix = Array.from(Array(3), () => new Float32Array(3).fill(0));
     }
+
+    static Mat4toMat3(a) {
+        let matrix = Array.from(Array(3), () => new Float32Array(3).fill(0));
+
+        matrix[0][0] = a[0][0];
+        matrix[0][1] = a[0][1];
+        matrix[0][2] = a[0][2];
+
+        matrix[1][0] = a[1][0];
+        matrix[1][1] = a[1][1];
+        matrix[1][2] = a[1][2];
+
+        matrix[2][0] = a[2][0];
+        matrix[2][1] = a[2][1];
+        matrix[2][2] = a[2][2];
+
+        return matrix
+    }
 }
 
 export class Matrix4 {
@@ -137,6 +155,31 @@ export class Matrix4 {
         matrix[3][1] = 0;
         matrix[3][2] = 0;
         matrix[3][3] = 1;
+
+        return matrix;
+    }
+
+    static Mat3toMat4(a) {
+        let matrix = new Matrix4();
+        matrix[0][0] = a[0][0];
+        matrix[0][1] = a[0][1];
+        matrix[0][2] = a[0][2];
+        matrix[0][3] = 0;
+
+        matrix[1][0] = a[1][0];
+        matrix[1][1] = a[1][1];
+        matrix[1][2] = a[1][2];
+        matrix[1][3] = 0;
+
+        matrix[2][0] = a[2][0];
+        matrix[2][1] = a[2][1];
+        matrix[2][2] = a[2][2];
+        matrix[2][3] = 0;
+
+        matrix[2][0] = 0;
+        matrix[2][1] = 0;
+        matrix[2][2] = 0;
+        matrix[2][3] = 0;
 
         return matrix;
     }

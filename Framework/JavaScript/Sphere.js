@@ -3,8 +3,8 @@ import { device, shaderModule } from "./Core.js";
 import { Matrix4 } from "./Tool.js";
 
 export class Sphere extends Object {
-  constructor(cubeName = "null") {
-    super(cubeName);
+  constructor(sphereName = "null") {
+    super(sphereName);
 
     this.positionArray = null;
     this.positionOffset = 0 * 4;

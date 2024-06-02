@@ -1,24 +1,44 @@
 import { Vector4 } from "./Tool";
 
-export class Light {
-    constructor(){
+class Light {
+    constructor(lightName, lightType) {
+        this.lightName = lightName;
+        this.lightType = lightType;
         this.position = new Vector4();
         this.color = new Vector4();
     }
 
-    setPosition(position){
+    setPosition(position) {
         this.position = position;
     }
 
-    setColor(color){
+    setColor(color) {
         this.color = color;
     }
 
-    getPosition(){
+    getPosition() {
         return this.position
     }
 
-    getColor(){
+    getColor() {
         return this.color;
+    }
+}
+
+class DirectionalLight extends Light {
+    constructor(lightName = "null") {
+        super(lightName, 0);
+    }
+}
+
+class PointLight extends Light {
+    constructor(lightName = "null") {
+        super(lightName, 1);
+    }
+}
+
+class SpotLight extends Light {
+    constructor(lightName = "null") {
+        super(lightName, 2);
     }
 }

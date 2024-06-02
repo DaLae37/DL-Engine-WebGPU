@@ -1,25 +1,46 @@
 export const cubeShader = `
-  struct Matrix {
-    matrix: mat4x4f,
+  struct CubeUniform {
+    worldMatrix: mat4x4<f32>,
+    normalMatrix : mat3x3<f32>,
   };
-  @group(0) @binding(0) var<uniform> uni: Matrix;
+
+  struct DirectionalLightUniforms {
+    lightDirection: vec3<f32>,
+}
+
+  @group(0) @binding(0) var<uniform> cubeUniform : CubeUniform;
+  @group(0) @binding(1) var<uniform> directionalLight : DirectionalLightUniforms;
+
+  struct VSInput {
+    @location(0) position : vec4<f32>,
+    @location(1) color : vec4<f32>,
+    @location(2) uv : vec2<f32>,
+    @location(3) normal : vec3<f32>,
+  }
 
   struct VSOutput {
-    @builtin(position) position: vec4f,
-    @location(0) fragUV: vec2f,
-    @location(1) fragPosition: vec4f,
+    @builtin(position) position: vec4<f32>,
+    @location(0) color : vec4<f32>,
+    @location(1) uv: vec2<f32>,
+    @location(2) normal : vec3<f32>,
   };
 
-  @vertex fn vs(@location(0) position : vec4f, @location(1) color : vec4f, @location(2) uv : vec2f) -> VSOutput {
+  @vertex fn vs(vsIn : VSInput) -> VSOutput {
     var vsOut: VSOutput;
-    vsOut.position = uni.matrix * position;
-    vsOut.fragUV = uv;
-    vsOut.fragPosition = color;
+    vsOut.position = cubeUniform.worldMatrix * vsIn.position;
+    vsOut.color = vsIn.color;
+    vsOut.uv = vsIn.uv;
+    vsOut.normal = cubeUniform.normalMatrix * vsIn.normal;
+
     return vsOut;
   }
 
-  @fragment fn fs(@location(0) fragUV: vec2f, @location(1) fragPosition: vec4f) -> @location(0) vec4f {
-    return fragPosition;
+  @fragment fn fs(vsOut : VSOutput) -> @location(0) vec4<f32> {
+    let normal = normalize(vsOut.normal);
+    let light = dot(normal, -directionalLight.lightDirection);
+    let color = vsOut.color.rgb * light;
+    
+    return vec4<f32>(color, vsOut.color.a);
   }
 `
 
