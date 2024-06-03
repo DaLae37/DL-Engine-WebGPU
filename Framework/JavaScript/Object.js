@@ -14,6 +14,7 @@ export class Object {
 
         this.uniformBufferSize = 0;
         this.uniformBuffer = null;
+        this.rotationMatrix = Matrix4.identity();
         this.worldMatrix = Matrix4.identity();
     }
 
@@ -35,9 +36,12 @@ export class Object {
 
     SetTransform(){
         this.worldMatrix = Matrix4.identity();
+        this.rotationMatrix = Matrix4.identity();
         this.worldMatrix = Transform.translate(this.worldMatrix, this.transform.position);
         this.worldMatrix = Transform.scale(this.worldMatrix, this.transform.scale);
-        this.worldMatrix = Transform.rotate(this.worldMatrix, this.transform.rotation);
+        this.rotationMatrix = Transform.rotate(this.rotationMatrix, this.transform.rotation);
+
+        this.worldMatrix = Matrix4.multiply(this.worldMatrix, this.rotationMatrix);
     }
 
     SetPosition(position) {

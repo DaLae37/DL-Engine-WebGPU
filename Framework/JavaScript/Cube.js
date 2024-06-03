@@ -21,7 +21,7 @@ export class Cube extends Object {
 
     this.normalArray = null;
     this.normalOffset = 10 * 4;
-    this.normalArrayLength = 3;
+    this.normalArrayLength = 4;
 
     this.oneVertexLength = this.positionArrayLength + this.colorArrayLength + this.uvArrayLength + this.normalArrayLength;
 
@@ -173,52 +173,52 @@ export class Cube extends Object {
 
     this.normalArray = new Float32Array([
       //Bottom
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
+      0, -1, 0, 0,
+      0, -1, 0, 0,
+      0, -1, 0, 0,
+      0, -1, 0, 0,
+      0, -1, 0, 0,
+      0, -1, 0, 0,
 
       //Right
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
+      1, 0, 0, 0,
+      1, 0, 0, 0,
+      1, 0, 0, 0,
+      1, 0, 0, 0,
+      1, 0, 0, 0,
+      1, 0, 0, 0,
 
       //Top
-      0, 1, 0,
-      0, 1, 0,
-      0, 1, 0,
-      0, 1, 0,
-      0, 1, 0,
-      0, 1, 0,
+      0, 1, 0, 0,
+      0, 1, 0, 0,
+      0, 1, 0, 0,
+      0, 1, 0, 0,
+      0, 1, 0, 0,
+      0, 1, 0, 0,
 
       //Left
-      -1, 0, 0,
-      -1, 0, 0,
-      -1, 0, 0,
-      -1, 0, 0,
-      -1, 0, 0,
-      -1, 0, 0,
+      -1, 0, 0, 0,
+      -1, 0, 0, 0,
+      -1, 0, 0, 0,
+      -1, 0, 0, 0,
+      -1, 0, 0, 0,
+      -1, 0, 0, 0,
 
       //Front
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
+      0, 0, 1, 0,
+      0, 0, 1, 0,
+      0, 0, 1, 0,
+      0, 0, 1, 0,
+      0, 0, 1, 0,
+      0, 0, 1, 0,
 
       //Back           
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
+      0, 0, -1, 0,
+      0, 0, -1, 0,
+      0, 0, -1, 0,
+      0, 0, -1, 0,
+      0, 0, -1, 0,
+      0, 0, -1, 0,
     ]);
 
     this.vertexArray = new Float32Array(this.oneVertexLength * this.vertexLength);
@@ -330,10 +330,11 @@ export class Cube extends Object {
       size: this.lightBufferSize,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
-    this.lightArray = new Float32Array(3);
-    this.lightArray[0] = Vector3.normalize(new Vector3(-0.5, -0.7, -1)).x;
-    this.lightArray[1] = Vector3.normalize(new Vector3(-0.5, -0.7, -1)).y;
-    this.lightArray[2] = Vector3.normalize(new Vector3(-0.5, -0.7, -1)).z;
+    this.lightArray = new Float32Array(4);
+    this.lightArray[0] = Vector3.normalize(new Vector3(0, 0, -2)).x;
+    this.lightArray[1] = Vector3.normalize(new Vector3(0, 0, -2)).y;
+    this.lightArray[2] = Vector3.normalize(new Vector3(0, 0, -2)).z;
+    this.lightArray[3] = 0;
     device.getDevice().queue.writeBuffer(this.lightBuffer, 0, this.lightArray);
 
     this.bindGroup = device.getDevice().createBindGroup({
@@ -362,15 +363,13 @@ export class Cube extends Object {
     super.Update(deltaTime);
 
     let worldMatrix = Matrix4.multiply(this.worldMatrix, cameraMatrix);
-    let normalMatrix = Matrix3.Mat4toMat3(Matrix4.inverse(this.worldMatrix));
+    let normalMatrix = Matrix4.transpose(Matrix4.inverse(this.rotationMatrix));
+
     this.uniformArray = new Float32Array(this.uniformBufferSize / 4);
     let index = 0;
     for (let i = 0; i < 4 * 4; i++) {
-      this.uniformArray[i] = worldMatrix[Math.floor(i / 4)][Math.floor(i % 4)];
-      index += 1;
-    }
-    for (let i = 0; i < 3 * 3; i++) {
-      this.uniformArray[i] = normalMatrix[Math.floor(i / 3)][Math.floor(i % 3)];
+      this.uniformArray[index] = worldMatrix[Math.floor(i / 4)][Math.floor(i % 4)];
+      this.uniformArray[4 * 4 + index] = normalMatrix[Math.floor(i / 4)][Math.floor(i % 4)];
       index += 1;
     }
     device.getDevice().queue.writeBuffer(this.uniformBuffer, 0, this.uniformArray);

@@ -12,7 +12,7 @@ export class MainScene extends Scene {
         this.AddObject(this.cube1);
         this.AddObject(this.cube2);
         
-        this.cube1.SetRotation(new Vector3(45, 0, 0));
+        this.cube1.SetRotation(new Vector3(0, 0, 0));
         this.cube1.SetScale(new Vector3(2, 2, 2));
         this.cube2.SetPosition(new Vector3(-5, 0, 0));
     }
@@ -20,7 +20,8 @@ export class MainScene extends Scene {
     Update(deltaTime) {
         super.Update(deltaTime);
         
-        this.cube1.Rotate(new Vector3(deltaTime * 45, 0, 0));
+        this.cube1.Rotate(new Vector3(0, deltaTime * 45, 0));
+        
         if (inputManager.GetKeyDown("KeyA")) {
             this.cube2.Translate(new Vector3(-5 * deltaTime));
         }

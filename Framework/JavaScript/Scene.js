@@ -88,7 +88,7 @@ class SceneManager {
         this.renderPassDescriptor = {
             colorAttachments: [
                 {
-                    clearValue: [1.0, 1.0, 1.0, 1.0],
+                    clearValue: [0, 0, 0, 1.0],
                     loadOp: "clear",
                     storeOp: "store",
                 },

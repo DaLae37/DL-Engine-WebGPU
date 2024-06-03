@@ -1,12 +1,12 @@
 export const cubeShader = `
   struct CubeUniform {
     worldMatrix: mat4x4<f32>,
-    normalMatrix : mat3x3<f32>,
+    normalMatrix : mat4x4<f32>,
   };
 
   struct DirectionalLightUniforms {
-    lightDirection: vec3<f32>,
-}
+    lightDirection: vec4<f32>,
+  };
 
   @group(0) @binding(0) var<uniform> cubeUniform : CubeUniform;
   @group(0) @binding(1) var<uniform> directionalLight : DirectionalLightUniforms;
@@ -15,14 +15,14 @@ export const cubeShader = `
     @location(0) position : vec4<f32>,
     @location(1) color : vec4<f32>,
     @location(2) uv : vec2<f32>,
-    @location(3) normal : vec3<f32>,
-  }
+    @location(3) normal : vec4<f32>,
+  };
 
   struct VSOutput {
     @builtin(position) position: vec4<f32>,
     @location(0) color : vec4<f32>,
     @location(1) uv: vec2<f32>,
-    @location(2) normal : vec3<f32>,
+    @location(2) normal : vec4<f32>,
   };
 
   @vertex fn vs(vsIn : VSInput) -> VSOutput {
