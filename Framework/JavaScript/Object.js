@@ -22,7 +22,7 @@ export class Object {
 
     }
 
-    SetRenderer() {
+    SetRenderTarget() {
 
     }
 
@@ -30,7 +30,7 @@ export class Object {
         this.SetTransform();
     }
 
-    Render(deltaTime, pass) {
+    Render(deltaTime, pass = null) {
 
     }
 

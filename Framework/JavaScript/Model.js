@@ -64,19 +64,3 @@ export class Model extends Object {
         super.Render(deltaTime);
     }
 }
-
-class GLTFBufferView {
-
-}
-
-class GLTFAccessor {
-
-}
-
-class GLTFPrimitive {
-
-}
-
-class GLTFMesh {
-
-}

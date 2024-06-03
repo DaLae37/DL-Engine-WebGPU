@@ -93,6 +93,14 @@ export class Vector3 {
 
         return new Vector3(x, y, z);
     }
+
+    static Vec4toVec3(a){
+        new Vector3(a.x, a.y, a.z);
+    }
+
+    static ArraytoVec3(a){
+        return new Vector3(a[0], a[1], a[2]);
+    }
 }
 
 export class Vector4 {
@@ -101,6 +109,10 @@ export class Vector4 {
         this.y = y;
         this.z = z;
         this.w = w;
+    }
+
+    static Vec3toVec4(a){
+        new Vector4(a.x, a.y, a.z, 0);
     }
 }
 
@@ -182,6 +194,32 @@ export class Matrix4 {
         matrix[3][3] = 0;
 
         return matrix;
+    }
+
+    static Mat4toFloat32Array(a) {
+        let array = new Float32Array(16);
+        
+        array[0] = a[0][0];
+        array[1] = a[0][1];
+        array[2] = a[0][2];
+        array[3] = a[0][3];
+
+        array[4] = a[1][0];
+        array[5] = a[1][1];
+        array[6] = a[1][2];
+        array[7] = a[1][3];
+
+        array[8] = a[2][0];
+        array[9] = a[2][1];
+        array[10] = a[2][2];
+        array[11] = a[2][3];
+
+        array[12] = a[3][0];
+        array[13] = a[3][1];
+        array[14] = a[3][2];
+        array[15] = a[3][3];
+
+        return array;
     }
 
     static transpose(a) {

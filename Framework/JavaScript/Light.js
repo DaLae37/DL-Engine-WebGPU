@@ -8,6 +8,10 @@ class Light {
         this.color = new Vector4();
     }
 
+    GetLightData(){
+        return this.lightType();
+    }
+
     setPosition(position) {
         this.position = position;
     }
@@ -28,6 +32,16 @@ class Light {
 class DirectionalLight extends Light {
     constructor(lightName = "null") {
         super(lightName, 0);
+
+        this.lightDirection = new Vector4();
+    }
+
+    SetLightDirection(lightDirection){
+        this.lightDirection = lightDirection;
+    }
+
+    GetLightData(){
+        return [super.GetLightData(), [this.lightDirection]];
     }
 }
 

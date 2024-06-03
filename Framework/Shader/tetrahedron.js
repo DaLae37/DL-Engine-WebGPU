@@ -1,5 +1,5 @@
-export const cubeShader = `
-  struct CubeUniform {
+export const tetrahedronShader = `
+  struct SphereUniform {
     worldMatrix : mat4x4<f32>,
     normalMatrix : mat4x4<f32>,
   };
@@ -8,7 +8,7 @@ export const cubeShader = `
     lightDirection: vec4<f32>,
   };
 
-  @group(0) @binding(0) var<uniform> cubeUniform : CubeUniform;
+  @group(0) @binding(0) var<uniform> sphereUniform : SphereUniform;
   @group(0) @binding(1) var<uniform> directionalLight : DirectionalLightUniforms;
 
   struct VSInput {
@@ -19,18 +19,18 @@ export const cubeShader = `
   };
 
   struct VSOutput {
-    @builtin(position) position: vec4<f32>,
+    @builtin(position) position : vec4<f32>,
     @location(0) color : vec4<f32>,
-    @location(1) uv: vec2<f32>,
+    @location(1) uv : vec2<f32>,
     @location(2) normal : vec4<f32>,
   };
 
   @vertex fn vs(vsIn : VSInput) -> VSOutput {
     var vsOut: VSOutput;
-    vsOut.position = cubeUniform.worldMatrix * vsIn.position;
+    vsOut.position = sphereUniform.worldMatrix * vsIn.position;
     vsOut.color = vsIn.color;
     vsOut.uv = vsIn.uv;
-    vsOut.normal = cubeUniform.normalMatrix * vsIn.normal;
+    vsOut.normal = sphereUniform.normalMatrix * vsIn.normal;
 
     return vsOut;
   }
@@ -40,11 +40,7 @@ export const cubeShader = `
     let light = dot(normal, -directionalLight.lightDirection.xyz);
     let diffuse = max(light, 0.0);
     let color = vsOut.color.rgb * diffuse;
-    
+
     return vec4<f32>(color, vsOut.color.a);
   }
-`;
-
-export const textureCubeShader = `
-
-`
+  `;
