@@ -1,4 +1,4 @@
-import { Transform, Matrix4, Vector3 } from "./Tool.js"
+import { Transform, Matrix4, Vector3 } from "../Core/Tool.js"
 
 export class Object {
     constructor(name) {

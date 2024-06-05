@@ -1,5 +1,5 @@
-import { Matrix4, Transform, Vector3 } from "./Tool.js"
-import { canvas } from "./Core.js"
+import { Matrix4, Transform, Vector3 } from "../Core/Tool.js"
+import { canvas } from "../Core/Core.js"
 
 export class Camera {
     constructor() {

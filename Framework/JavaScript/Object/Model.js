@@ -1,4 +1,4 @@
-import { Object } from "./Object.js";
+import { Object } from "../Core/Object.js";
 
 export class Model extends Object {
     constructor(modelSrc, textureSrc = "null", spriteName = "null") {

@@ -1,6 +1,6 @@
 import { Object } from "./Object.js";
-import { device, shaderModule } from "./Core.js";
-import { Matrix3, Matrix4, Vector3, color } from "./Tool.js";
+import { device, shaderModule } from "../Core/Core.js";
+import { Matrix4, Vector3, color } from "../Core/Tool.js";
 
 export class Cube extends Object {
   constructor(cubeName = "null", length = 1, width = 1, height = 1) {

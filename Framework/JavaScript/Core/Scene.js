@@ -1,4 +1,4 @@
-import { Camera } from "./Camera.js"
+import { Camera } from "../Object/Camera.js"
 import { device, canvas } from "./Core.js";
 import { Matrix4 } from "./Tool.js";
 

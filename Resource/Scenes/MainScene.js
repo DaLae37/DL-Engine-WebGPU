@@ -1,9 +1,9 @@
-import { Scene } from "../../Framework/JavaScript/Scene.js";
-import { Cube } from "../../Framework/JavaScript/Cube.js";
-import { Sphere } from "../../Framework/JavaScript/Sphere.js";
-import { Tetrahedron } from "../../Framework/JavaScript/Tetrahedron.js";
-import { color, Vector3 } from "../../Framework/JavaScript/Tool.js";
-import { inputManager } from "../../Framework/JavaScript/Input.js";
+import { Scene } from "../../Framework/JavaScript/Core/Scene.js";
+import { Cube } from "../../Framework/JavaScript/Object/Cube.js";
+import { Sphere } from "../../Framework/JavaScript/Object/Sphere.js";
+import { Tetrahedron } from "../../Framework/JavaScript/Object/Tetrahedron.js";
+import { color, Vector3 } from "../../Framework/JavaScript/Core/Tool.js";
+import { inputManager } from "../../Framework/JavaScript/Core/Input.js";
 
 export class MainScene extends Scene {
     constructor(sceneName) {

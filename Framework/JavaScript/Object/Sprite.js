@@ -1,5 +1,5 @@
 import { Object, ObjectManager } from "./Object.js";
-import { canvas, device, shaderModule } from "./Core.js";
+import { device, shaderModule } from "../Core/Core.js";
 
 export class Sprite extends Object {
     constructor(src, spriteName = "null") {

@@ -1,6 +1,6 @@
 import { Object } from "./Object.js";
-import { device, shaderModule } from "./Core.js";
-import { Matrix4, Vector3 } from "./Tool.js";
+import { device, shaderModule } from "../Core/Core.js";
+import { Matrix4, Vector3 } from "../Core/Tool.js";
 
 export class Sphere extends Object {
   constructor(sphereName = "null", radius = 1, latitudeBands = 30, longitudeBands = 30) {

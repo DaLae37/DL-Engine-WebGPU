@@ -1,4 +1,4 @@
-import { Vector4 } from "./Tool";
+import { Vector4 } from "../Core/Tool";
 
 class Light {
     constructor(lightName, lightType) {
