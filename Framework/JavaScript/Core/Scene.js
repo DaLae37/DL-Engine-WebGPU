@@ -67,6 +67,7 @@ class SceneManager {
         this.currentScene = null;
         this.sceneDictionary = {}; //Dictionary
 
+        this.backgroundColor = [1.0, 1.0, 1.0, 1.0];
         this.renderPassDescriptor = null;
         this.depthTexture = null;
     }
@@ -88,7 +89,7 @@ class SceneManager {
         this.renderPassDescriptor = {
             colorAttachments: [
                 {
-                    clearValue: [0.5, 0.5, 0.5, 1.0],
+                    clearValue: this.backgroundColor,
                     loadOp: "clear",
                     storeOp: "store",
                 },
@@ -145,6 +146,15 @@ class SceneManager {
     DeleteScene(sceneName) {
         if (sceneName in this.sceneDictionary) {
             delete this.sceneDictionary[sceneName];
+        }
+    }
+
+    SetSceneBackground(color){
+        if(this.renderPassDescriptor != null){
+            this.renderPassDescriptor.colorAttachments[0].clearValue = color;
+        }
+        else {
+            this.backgroundColor = color;
         }
     }
 

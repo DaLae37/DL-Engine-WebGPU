@@ -147,6 +147,7 @@ export class Cube extends Object {
     this.SetRenderTarget();
     this.isLoaded = true;
   }
+  
   SetRenderTarget() {
     super.SetRenderTarget();
 
@@ -180,7 +181,7 @@ export class Cube extends Object {
                 //normal
                 shaderLocation: 3,
                 offset: this.normalOffset,
-                format: "float32x3",
+                format: "float32x4",
               },
             ],
           },
@@ -212,21 +213,21 @@ export class Cube extends Object {
     device.getDevice().queue.writeBuffer(this.vertexBuffer, 0, this.vertexArray);
 
     this.indexBuffer = device.getDevice().createBuffer({
-      size: this.vertexArray.byteLength,
+      size: this.indexArray.byteLength,
       usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
     });
     device.getDevice().queue.writeBuffer(this.indexBuffer, 0, this.indexArray);
 
     this.uniformBufferSize = (4 * 4 + 4 * 4) * 4;
     this.uniformBuffer = device.getDevice().createBuffer({
-      label: this.cubeName,
+      label: this.name,
       size: this.uniformBufferSize,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
 
     this.lightBufferSize = 4 * 4;
     this.lightBuffer = device.getDevice().createBuffer({
-      label: this.cubeName,
+      label: this.name,
       size: this.lightBufferSize,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
@@ -264,10 +265,10 @@ export class Cube extends Object {
     super.Update(deltaTime);
 
     let worldMatrix = Matrix4.multiply(this.worldMatrix, cameraMatrix);
-    let normalMatrix = Matrix4.transpose(Matrix4.inverse(this.rotationMatrix));
+    let rotationMatrix = Matrix4.transpose(Matrix4.inverse(this.rotationMatrix));
 
     device.getDevice().queue.writeBuffer(this.uniformBuffer, 0, Matrix4.Mat4toFloat32Array(worldMatrix));
-    device.getDevice().queue.writeBuffer(this.uniformBuffer, 4 * 4 * 4, Matrix4.Mat4toFloat32Array(normalMatrix));
+    device.getDevice().queue.writeBuffer(this.uniformBuffer, 4 * 4 * 4, Matrix4.Mat4toFloat32Array(rotationMatrix));
   }
 
   Render(deltaTime, pass) {

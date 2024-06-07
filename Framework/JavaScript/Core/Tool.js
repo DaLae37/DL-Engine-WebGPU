@@ -452,11 +452,11 @@ export class Matrix4 {
 
         matrix[1][0] = 0;
         matrix[1][1] = cos;
-        matrix[1][2] = sin;
+        matrix[1][2] = -sin;
         matrix[1][3] = 0;
 
         matrix[2][0] = 0;
-        matrix[2][1] = -sin;
+        matrix[2][1] = sin;
         matrix[2][2] = cos;
         matrix[2][3] = 0;
 
@@ -476,7 +476,7 @@ export class Matrix4 {
 
         matrix[0][0] = cos;
         matrix[0][1] = 0;
-        matrix[0][2] = -sin;
+        matrix[0][2] = sin;
         matrix[0][3] = 0;
 
         matrix[1][0] = 0;
@@ -484,7 +484,7 @@ export class Matrix4 {
         matrix[1][2] = 0;
         matrix[1][3] = 0;
 
-        matrix[2][0] = sin;
+        matrix[2][0] = -sin;
         matrix[2][1] = 0;
         matrix[2][2] = cos;
         matrix[2][3] = 0;
@@ -504,11 +504,11 @@ export class Matrix4 {
         let sin = Math.sin(radian);
 
         matrix[0][0] = cos;
-        matrix[0][1] = sin;
+        matrix[0][1] = -sin;
         matrix[0][2] = 0;
         matrix[0][3] = 0;
 
-        matrix[1][0] = -sin;
+        matrix[1][0] = sin;
         matrix[1][1] = cos;
         matrix[1][2] = 0;
         matrix[1][3] = 0;

@@ -138,8 +138,6 @@ export class Camera {
     }
 
     Rotate(degeres){
-        console.log(this.matrix)
         this.matrix = Matrix4.rotationX(Matrix4.rotationY(degeres.x), degeres.y);
-        console.log(this.matrix)
     }
 }

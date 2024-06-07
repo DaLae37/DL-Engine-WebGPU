@@ -22,7 +22,7 @@ export class Tetrahedron extends Object {
 
     this.normalArray = null;
     this.normalOffset = 9 * 4;
-    this.normalArrayLength = 3;
+    this.normalArrayLength = 4;
 
     this.oneVertexLength = this.positionArrayLength + this.colorArrayLength + this.uvArrayLength + this.normalArrayLength;
 
@@ -38,39 +38,37 @@ export class Tetrahedron extends Object {
     super.LoadResource();
 
     const s = this.size;
-    const sqrt2 = Math.sqrt(2);
     const sqrt6 = Math.sqrt(6);
+    const sqrt3 = Math.sqrt(3);
 
-    this.positionArray = new Float32Array([
-      // Vertex positions
-      0, 0, s * sqrt6 / 3, // Top vertex
-      -s / 2, 0, -s * sqrt6 / 6, // Bottom left vertex
-      s / 2, 0, -s * sqrt6 / 6, // Bottom right vertex
-      0, s * sqrt2 / 2, 0, // Front vertex
+    this.positionArray = new Float32Array([ // offset : 3
+      0, -s * sqrt6 / 3, s * sqrt3 / 2, // Front
+      -s, -s * sqrt6 / 3, -s * sqrt3 / 2, // Left
+      s, -s * sqrt6 / 3, -s * sqrt3 / 2, // Right
+      0, s * sqrt6 / 3, 0, // Top
     ]);
 
-    this.colorArray = new Float32Array([
-      // Vertex colors
-      1, 0, 0, 1, // Red
-      0, 1, 0, 1, // Green
-      0, 0, 1, 1, // Blue
-      1, 1, 0, 1, // Yellow
-    ]);
+    if(this.colorArray == null){
+      this.colorArray = new Float32Array([ // offset : 4
+        1, 0, 0, 1, // Red
+        0, 1, 0, 1, // Green
+        0, 0, 1, 1, // Blue
+        1, 1, 0, 1, // Yellow
+      ]);
+    }
 
-    this.uvArray = new Float32Array([
-      // UV coordinates
+    this.uvArray = new Float32Array([ // offset : 2
       0.5, 1,
       0, 0,
       1, 0,
       0.5, 0.5,
     ]);
 
-    this.normalArray = new Float32Array([
-      // Normals
-      0, 0, 1,
-      0, 0, -1,
-      1, 0, 0,
-      0, 1, 0,
+    this.normalArray = new Float32Array([ // offset : 4
+      0, 0, 1, 0,
+      -1, 0, 1, 0,
+      1, 0, 1, 0,
+      0, 1, 1, 0,
     ]);
 
     this.vertexArray = new Float32Array(this.oneVertexLength * this.vertexLength);
@@ -82,7 +80,6 @@ export class Tetrahedron extends Object {
     }
 
     this.indexArray = new Uint16Array([
-      // Indices
       0, 1, 2,
       0, 3, 1,
       1, 3, 2,
@@ -126,7 +123,7 @@ export class Tetrahedron extends Object {
                 // normal
                 shaderLocation: 3,
                 offset: this.normalOffset,
-                format: "float32x3",
+                format: "float32x4",
               },
             ],
           },
@@ -177,7 +174,7 @@ export class Tetrahedron extends Object {
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
     this.lightArray = new Float32Array(4);
-    let tmp = Vector3.normalize(new Vector3(0, 0, -1));
+    let tmp = Vector3.normalize(new Vector3(5, 0, -1));
     this.lightArray[0] = tmp.x;
     this.lightArray[1] = tmp.y;
     this.lightArray[2] = tmp.z;
@@ -247,7 +244,7 @@ export class Tetrahedron extends Object {
   SetSize(size = 1) {
     this.size = size;
 
-    const s = this.size;
+    const s = this.size * 2;
     const sqrt2 = Math.sqrt(2);
     const sqrt6 = Math.sqrt(6);
 

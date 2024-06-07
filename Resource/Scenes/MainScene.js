@@ -16,22 +16,22 @@ export class MainScene extends Scene {
         this.AddObject(this.cube2);
         this.AddObject(this.sphere);
         
-        this.cube1.SetRotation(new Vector3(0, 0, 0));
-        this.cube1.SetSize(1,1,1);
-        this.cube2.SetPosition(new Vector3(-5, 0, 0));
+        //this.cube1.SetRotation(new Vector3(45, 0, 0));
+        this.cube1.SetPosition(new Vector3(-5, 0, 0));
+        this.cube2.SetRotation(new Vector3(0, 0, 0));
+        //this.cube2.SetColor(color.GetColorCode("blue"));
         //this.cube2.SetScale(new Vector3(2,2,2));
-        this.cube1.SetColor(color.GetColorCode("blue"));
+        //this.cube1.SetColor(color.GetColorCode("blue"));
 
         this.sphere.SetPosition(new Vector3(5, 0, 0));
-        this.sphere.SetColor(color.GetColorCode("red"));
+        //this.sphere.SetColor(color.GetColorCode("red"));
     }
 
     Update(deltaTime) {
         super.Update(deltaTime);
-        
-        this.cube1.Rotate(new Vector3(0, deltaTime * 45, 0));
-        this.cube2.Rotate(new Vector3(0, deltaTime * 45, 0));
-        this.sphere.Rotate(new Vector3(0, deltaTime * 45, 0));
+        //this.cube1.Rotate(new Vector3(0, deltaTime * 45, 0));
+        this.cube2.Rotate(new Vector3(0, deltaTime * 90, 0));
+        //this.sphere.Rotate(new Vector3(0, deltaTime * 45, 0));
         if (inputManager.GetKeyDown("KeyA")) {
             this.cube2.Translate(new Vector3(-5 * deltaTime));
         }

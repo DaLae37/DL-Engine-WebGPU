@@ -24,7 +24,7 @@ export class Sphere extends Object {
 
     this.normalArray = null;
     this.normalOffset = 9 * 4;
-    this.normalArrayLength = 3;
+    this.normalArrayLength = 4;
 
     this.oneVertexLength = this.positionArrayLength + this.colorArrayLength + this.uvArrayLength + this.normalArrayLength;
 
@@ -39,36 +39,39 @@ export class Sphere extends Object {
   async LoadResource() {
     super.LoadResource();
 
-    const latitudeBands = this.latitudeBands;
-    const longitudeBands = this.longitudeBands;
-    const radius = this.radius;
+    let latitudeBands = this.latitudeBands;
+    let longitudeBands = this.longitudeBands;
+    let radius = this.radius;
 
-    const vertexPositionData = [];
-    const normalData = [];
-    const textureCoordData = [];
-    const colorData = [];
+    let vertexPositionData = [];
+    let normalData = [];
+    let textureCoordData = [];
+    let colorData = [];
 
     for (let latNumber = 0; latNumber <= latitudeBands; ++latNumber) {
-      const theta = latNumber * Math.PI / latitudeBands;
-      const sinTheta = Math.sin(theta);
-      const cosTheta = Math.cos(theta);
+      let theta = latNumber * Math.PI / latitudeBands;
+      let sinTheta = Math.sin(theta);
+      let cosTheta = Math.cos(theta);
 
       for (let longNumber = 0; longNumber <= longitudeBands; ++longNumber) {
-        const phi = longNumber * 2 * Math.PI / longitudeBands;
-        const sinPhi = Math.sin(phi);
-        const cosPhi = Math.cos(phi);
+        let phi = longNumber * 2 * Math.PI / longitudeBands;
+        let sinPhi = Math.sin(phi);
+        let cosPhi = Math.cos(phi);
 
-        const x = cosPhi * sinTheta;
-        const y = cosTheta;
-        const z = sinPhi * sinTheta;
-        const u = 1 - (longNumber / longitudeBands);
-        const v = 1 - (latNumber / latitudeBands);
+        let x = cosPhi * sinTheta;
+        let y = cosTheta;
+        let z = sinPhi * sinTheta;
+        let u = 1 - (longNumber / longitudeBands);
+        let v = 1 - (latNumber / latitudeBands);
 
         normalData.push(x);
         normalData.push(y);
         normalData.push(z);
+        normalData.push(0);
+
         textureCoordData.push(u);
         textureCoordData.push(v);
+
         vertexPositionData.push(radius * x);
         vertexPositionData.push(radius * y);
         vertexPositionData.push(radius * z);
@@ -83,13 +86,15 @@ export class Sphere extends Object {
     this.positionArray = new Float32Array(vertexPositionData);
     this.normalArray = new Float32Array(normalData);
     this.uvArray = new Float32Array(textureCoordData);
-    this.colorArray = new Float32Array(colorData);
+    if(this.colorArray == null){
+      this.colorArray = new Float32Array(colorData);
+    }
 
-    const indexData = [];
+    let indexData = [];
     for (let latNumber = 0; latNumber < latitudeBands; ++latNumber) {
       for (let longNumber = 0; longNumber < longitudeBands; ++longNumber) {
-        const first = (latNumber * (longitudeBands + 1)) + longNumber;
-        const second = first + longitudeBands + 1;
+        let first = (latNumber * (longitudeBands + 1)) + longNumber;
+        let second = first + longitudeBands + 1;
         indexData.push(first);
         indexData.push(second);
         indexData.push(first + 1);
@@ -147,7 +152,7 @@ export class Sphere extends Object {
                 // normal
                 shaderLocation: 3,
                 offset: this.normalOffset,
-                format: "float32x3",
+                format: "float32x4",
               },
             ],
           },
@@ -259,5 +264,9 @@ export class Sphere extends Object {
       }
       device.getDevice().queue.writeBuffer(this.vertexBuffer, 0, this.vertexArray);
     }
+  }
+
+  GetColor() {
+    return color.GetColorName(this.color);
   }
 }

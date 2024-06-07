@@ -1,16 +1,17 @@
-import { Object, ObjectManager } from "./Object.js";
+import { Object } from "./Object.js";
 import { device, shaderModule } from "../Core/Core.js";
+import { Matrix4 } from "../Core/Tool.js";
 
 export class Sprite extends Object {
     constructor(src, spriteName = "null") {
         super(spriteName);
 
         this.image = null;
-        
+
         this.texture = null;
         this.sampler = null;
         this.group = [];
-        
+
         this.width = null;
         this.height = null;
 
@@ -38,32 +39,37 @@ export class Sprite extends Object {
             { width: this.width, height: this.height },
         );
 
-        this.SetRender();
+        this.SetRenderTarget();
         this.isLoaded = true;
     }
 
-    SetRender() {
-        super.SetRender();
+    SetRenderTarget() {
+        super.SetRenderTarget();
 
-        this.module = shaderModule.UseModule("texture");
         this.pipeline = device.getDevice().createRenderPipeline({
             label: "sprite",
             layout: "auto",
             vertex: {
-                module: this.module,
+                module: shaderModule.UseModule("sprite"),
             },
             fragment: {
-                module: this.module,
+                module: shaderModule.UseModule("sprite"),
                 targets: [{ format: device.presentationFormat }],
+            },
+            primitive: {
+                topology: "triangle-list",
+                cullMode: "back",
+            },
+            depthStencil: {
+                depthWriteEnabled: true,
+                depthCompare: "less",
+                format: "depth24plus",
             },
         });
 
-        this.uniformBufferSize =
-            2 * 4 + //translate
-            2 * 4 + //scale
-            4 * 4; //color
+        this.uniformBufferSize = (4 * 4) * 4;
         this.uniformBuffer = device.getDevice().createBuffer({
-            label: "texture",
+            label: this.name,
             size: this.uniformBufferSize,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
@@ -76,7 +82,7 @@ export class Sprite extends Object {
             });
 
             let binding = device.getDevice().createBindGroup({
-                label : this.src,
+                label: this.src,
                 layout: this.pipeline.getBindGroupLayout(0),
                 entries: [
                     { binding: 0, resource: this.sampler },
@@ -88,15 +94,11 @@ export class Sprite extends Object {
         }
     }
 
-    Update(deltaTime) {
+    Update(deltaTime, cameraMatrix) {
         super.Update(deltaTime);
 
-        let uniformValues = new Float32Array(this.uniformBufferSize / 4);
-
-        uniformValues.set([this.transform.position.x, this.transform.position.y], 0);
-        uniformValues.set([this.transform.scale.x, this.transform.scale.y], 2);
-        uniformValues.set([1, 1, 1, 1], 4);
-        device.getDevice().queue.writeBuffer(this.uniformBuffer, 0, uniformValues);
+        let worldMatrix = Matrix4.multiply(this.worldMatrix, cameraMatrix);
+        device.getDevice().queue.writeBuffer(this.uniformBuffer, 0, Matrix4.Mat4toFloat32Array(worldMatrix));
     }
 
     Render(deltaTime, pass) {
@@ -110,12 +112,27 @@ export class Sprite extends Object {
     getSize() {
         return [this.width, this.height];
     }
+}
 
-    setWidth(width) {
-        this.width = width;
+class SpriteManager {
+    constructor() {
+        this.srcDictionary = {}; //Dictionary
     }
 
-    setHeight(height) {
-        this.height = height;
+    async LoadImageToSrc(src) {
+        if (src in this.srcDictionary) {
+            return this.srcDictionary[src];
+        }
+        else {
+            let response = await fetch(src);
+
+            if (response.ok) {
+                let image = await createImageBitmap(await response.blob());
+                this.srcDictionary[src] = image;
+                return image;
+            }
+        }
     }
 }
+
+export const spriteManager = new SpriteManager();

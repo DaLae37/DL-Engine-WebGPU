@@ -62,7 +62,7 @@ class Device {
         this.context.configure({
             device: this.device,
             format: this.presentationFormat,
-            alphamode : "premultiplied"
+            alphamode: "premultiplied"
         });
     }
 
@@ -83,9 +83,10 @@ class Device {
     }
 }
 
+import { spriteShader } from "../Shader/sprite.js"
 import { cubeShader, textureCubeShader } from "../Shader/cube.js";
 import { sphereShader } from "../Shader/sphere.js";
-import { textureShader } from "../Shader/texture.js"
+import { tetrahedronShader } from "../Shader/tetrahedron.js";
 
 class ShaderModule {
     constructor() {
@@ -95,10 +96,10 @@ class ShaderModule {
 
     SetShader() {
         if (device.getDevice()) { //Add Using Shaders
-            this.shaderDictionary["texture"] = textureShader;
+            this.shaderDictionary["sprite"] = spriteShader;
             this.shaderDictionary["cube"] = cubeShader;
             this.shaderDictionary["sphere"] = sphereShader;
-            this.shaderDictionary["tetrahedron"] = sphereShader;
+            this.shaderDictionary["tetrahedron"] = tetrahedronShader;
             this.shaderDictionary["textureShader"] = textureCubeShader;
             //this.shaderDictionary["label"] = shader;
         }

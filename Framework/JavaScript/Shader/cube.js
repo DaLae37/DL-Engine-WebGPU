@@ -1,7 +1,7 @@
 export const cubeShader = `
   struct CubeUniform {
     worldMatrix : mat4x4<f32>,
-    normalMatrix : mat4x4<f32>,
+    rotationMatrix : mat4x4<f32>,
   };
 
   struct DirectionalLightUniforms {
@@ -30,7 +30,7 @@ export const cubeShader = `
     vsOut.position = cubeUniform.worldMatrix * vsIn.position;
     vsOut.color = vsIn.color;
     vsOut.uv = vsIn.uv;
-    vsOut.normal = cubeUniform.normalMatrix * vsIn.normal;
+    vsOut.normal = cubeUniform.rotationMatrix * vsIn.normal;
 
     return vsOut;
   }
@@ -41,7 +41,7 @@ export const cubeShader = `
     let diffuse = max(light, 0.0);
     let color = vsOut.color.rgb * diffuse;
     
-    return vec4<f32>(color, vsOut.color.a);
+    return vec4<f32>(vsOut.color.rgb, vsOut.color.a);
   }
 `;
 

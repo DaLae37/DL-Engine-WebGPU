@@ -14,8 +14,7 @@ export class Object {
 
         this.uniformBufferSize = 0;
         this.uniformBuffer = null;
-        this.rotationMatrix = Matrix4.identity();
-        this.worldMatrix = Matrix4.identity();
+        this.SetTransform();
     }
 
     async LoadResource() {
@@ -27,7 +26,7 @@ export class Object {
     }
 
     Update(deltaTime, cameraMatrix = Matrix4.identity()) {
-        this.SetTransform();
+
     }
 
     Render(deltaTime, pass = null) {
@@ -36,58 +35,53 @@ export class Object {
 
     SetTransform(){
         this.worldMatrix = Matrix4.identity();
-        this.rotationMatrix = Matrix4.identity();
-        this.worldMatrix = Transform.translate(this.worldMatrix, this.transform.position);
-        this.worldMatrix = Transform.scale(this.worldMatrix, this.transform.scale);
-        this.rotationMatrix = Transform.rotate(this.rotationMatrix, this.transform.rotation);
-
-        this.worldMatrix = Matrix4.multiply(this.worldMatrix, this.rotationMatrix);
+        this.rotationMatrix = Matrix4.identity();    
     }
 
     SetPosition(position) {
+        let offset = Vector3.subtract(position, this.transform.position);
+        this.Translate(offset);
         this.transform.position = position;
     }
 
     SetScale(scale) {
+        let offset = Vector3.subtract(scale, this.transform.scale);
+        this.Scaling(offset);
         this.transform.scale = scale;
     }
 
     SetRotation(rotation) {
-        this.transform.rotation.x = Transform.degreeTOradian(rotation.x);
-        this.transform.rotation.y = Transform.degreeTOradian(rotation.y);
-        this.transform.rotation.z = Transform.degreeTOradian(rotation.z);
+        let position = this.transform.position;
+        let radians = new Vector3(Transform.degreeTOradian(rotation.x), Transform.degreeTOradian(rotation.y), Transform.degreeTOradian(rotation.z));
+        let offset = Vector3.subtract(radians, this.transform.rotation);
+
+        this.Translate(new Vector3(-this.transform.position.x, -this.transform.position.y, -this.transform.position.z));
+        this.rotationMatrix = Transform.rotate(this.rotationMatrix, offset);
+        this.worldMatrix = Transform.rotate(this.worldMatrix, offset);
+        this.Translate(position);
+
+        this.transform.rotation = radians;
     }
 
     Translate(offset) {
+        this.worldMatrix = Transform.translate(this.worldMatrix, offset);
         this.transform.position = Vector3.add(this.transform.position, offset);
     }
 
-    Scaling(scale) {
-        this.transform.scale = Vector3.add(this.transform.scale, scale);
+    Scaling(offset) {
+        this.worldMatrix = Transform.scale(this.worldMatrix, offset);
+        this.transform.scale = Vector3.add(this.transform.scale, offset);
     }
 
-    Rotate(degrees) {
-        this.transform.rotation = Vector3.add(this.transform.rotation, new Vector3(Transform.degreeTOradian(degrees.x), Transform.degreeTOradian(degrees.y), Transform.degreeTOradian(degrees.z)));
-    }
-}
+    Rotate(offset) {
+        let position = this.transform.position;
+        let radians = new Vector3(Transform.degreeTOradian(offset.x), Transform.degreeTOradian(offset.y), Transform.degreeTOradian(offset.z));
 
-export class ObjectManager {
-    constructor() {
-        this.objectDictionary = {}; //Dictionary
-    }
+        this.Translate(new Vector3(-this.transform.position.x, -this.transform.position.y, -this.transform.position.z));
+        this.worldMatrix = Transform.rotate(this.worldMatrix, radians);
+        this.rotationMatrix = Transform.rotate(this.rotationMatrix, radians);
+        this.Translate(position);
 
-    async LoadImageToSrc(src) {
-        if (src in this.objectDictionary) {
-            return this.objectDictionary[src];
-        }
-        else {
-            let response = await fetch(src);
-
-            if (response.ok) {
-                let image = await createImageBitmap(await response.blob());
-                this.objectDictionary[src] = image;
-                return image;
-            }
-        }
+        this.transform.rotation = Vector3.add(this.transform.rotation, radians);
     }
 }

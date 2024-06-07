@@ -1,14 +1,14 @@
 export const tetrahedronShader = `
-  struct SphereUniform {
+  struct TetrahedronUniform {
     worldMatrix : mat4x4<f32>,
-    normalMatrix : mat4x4<f32>,
+    rotationMatrix : mat4x4<f32>,
   };
 
   struct DirectionalLightUniforms {
     lightDirection: vec4<f32>,
   };
 
-  @group(0) @binding(0) var<uniform> sphereUniform : SphereUniform;
+  @group(0) @binding(0) var<uniform> tetrahedronUniform : TetrahedronUniform;
   @group(0) @binding(1) var<uniform> directionalLight : DirectionalLightUniforms;
 
   struct VSInput {
@@ -27,10 +27,10 @@ export const tetrahedronShader = `
 
   @vertex fn vs(vsIn : VSInput) -> VSOutput {
     var vsOut: VSOutput;
-    vsOut.position = sphereUniform.worldMatrix * vsIn.position;
+    vsOut.position = tetrahedronUniform.worldMatrix * vsIn.position;
     vsOut.color = vsIn.color;
     vsOut.uv = vsIn.uv;
-    vsOut.normal = sphereUniform.normalMatrix * vsIn.normal;
+    vsOut.normal = tetrahedronUniform.rotationMatrix * vsIn.normal;
 
     return vsOut;
   }
@@ -41,6 +41,6 @@ export const tetrahedronShader = `
     let diffuse = max(light, 0.0);
     let color = vsOut.color.rgb * diffuse;
 
-    return vec4<f32>(color, vsOut.color.a);
+    return vec4<f32>(vsOut.color.rgb, vsOut.color.a);
   }
   `;
