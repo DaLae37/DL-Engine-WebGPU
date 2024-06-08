@@ -76,9 +76,9 @@ export class Sphere extends Object {
         vertexPositionData.push(radius * y);
         vertexPositionData.push(radius * z);
 
-        colorData.push(1.0);
-        colorData.push(1.0);
-        colorData.push(1.0);
+        colorData.push(u);
+        colorData.push(v);
+        colorData.push(1 - u);
         colorData.push(1.0);
       }
     }
@@ -203,7 +203,7 @@ export class Sphere extends Object {
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
     this.lightArray = new Float32Array(4);
-    let tmp = Vector3.normalize(new Vector3(0, 0, -1));
+    let tmp = Vector3.normalize(new Vector3(0, 10, -60));
     this.lightArray[0] = tmp.x;
     this.lightArray[1] = tmp.y;
     this.lightArray[2] = tmp.z;

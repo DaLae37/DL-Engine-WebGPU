@@ -3,10 +3,11 @@ import { canvas } from "../Core/Core.js"
 
 export class Camera {
     constructor() {
-        this.projectionMatrix = new Matrix4();
-        this.matrix = new Matrix4();
-        this.viewMatrix = new Matrix4();
-        this.cameraMatrix = new Matrix4();
+        this.projectionMatrix = Matrix4.identity();
+        this.matrix = Matrix4.identity();
+        this.viewMatrix = Matrix4.identity();
+        this.cameraMatrix = Matrix4.identity();
+        this.rotationMatrix = Matrix4.identity();
 
         this.right = new Vector3();
         this.forward = new Vector3();
@@ -15,12 +16,14 @@ export class Camera {
         this.at = new Vector3(0, 0, 0);
         this.up = new Vector3(0, 1, 0);
 
-        this.fieldOfView = Transform.degreeTOradian(90);
+        this.fieldOfView = Transform.degreeToRadian(90);
         this.pitch = 0;
         this.yaw = 0;
+        this.roll = 0;
     }
 
     Update(deltaTime) {
+        this.rotationMatrix = Transform.rotate(this.rotationMatrix, new Vector3(this.pitch, this.yaw, this.roll));
         this.projectionMatrix = this.perspective(this.fieldOfView, canvas.getCanvas().clientWidth / canvas.getCanvas().clientHeight, 1, 100);
 
         this.matrix = this.look(this.eye, this.at, this.up);
@@ -122,11 +125,11 @@ export class Camera {
     }
 
     SetFeildOfView(degree){
-        this.fieldOfView = Transform.degreeTOradian(degree);
+        this.fieldOfView = Transform.degreeToRadian(degree);
     }
 
     SetPosition(position){
-        this.position = position;
+        this.eye = position;
     }
 
     SetRotation(rotation){
@@ -135,9 +138,10 @@ export class Camera {
 
     Translate(offset){
         this.eye = Vector3.add(this.eye, offset);
+        this.at = Vector3.add(this.at, offset);
     }
 
     Rotate(degeres){
-        this.matrix = Matrix4.rotationX(Matrix4.rotationY(degeres.x), degeres.y);
+        this.at = Vector3.add(this.at, degeres);
     }
-}
+} 

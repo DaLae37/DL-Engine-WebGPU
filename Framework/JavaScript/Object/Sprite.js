@@ -1,4 +1,4 @@
-import { Object } from "./Object.js";
+import { Object, objectManager } from "./Object.js";
 import { device, shaderModule } from "../Core/Core.js";
 import { Matrix4 } from "../Core/Tool.js";
 
@@ -21,7 +21,7 @@ export class Sprite extends Object {
     async LoadResource() {
         super.LoadResource();
 
-        this.image = await spriteManager.LoadImageToSrc(this.src);
+        this.image = await objectManager.LoadImageToSrc(this.src);
         this.width = this.image.width;
         this.height = this.image.height;
 
@@ -113,26 +113,3 @@ export class Sprite extends Object {
         return [this.width, this.height];
     }
 }
-
-class SpriteManager {
-    constructor() {
-        this.srcDictionary = {}; //Dictionary
-    }
-
-    async LoadImageToSrc(src) {
-        if (src in this.srcDictionary) {
-            return this.srcDictionary[src];
-        }
-        else {
-            let response = await fetch(src);
-
-            if (response.ok) {
-                let image = await createImageBitmap(await response.blob());
-                this.srcDictionary[src] = image;
-                return image;
-            }
-        }
-    }
-}
-
-export const spriteManager = new SpriteManager();

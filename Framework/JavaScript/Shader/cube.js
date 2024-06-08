@@ -41,7 +41,7 @@ export const cubeShader = `
     let diffuse = max(light, 0.0);
     let color = vsOut.color.rgb * diffuse;
     
-    return vec4<f32>(vsOut.color.rgb, vsOut.color.a);
+    return vec4<f32>(color.rgb, vsOut.color.a);
   }
 `;
 

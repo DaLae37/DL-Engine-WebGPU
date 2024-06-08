@@ -174,7 +174,7 @@ export class Tetrahedron extends Object {
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
     this.lightArray = new Float32Array(4);
-    let tmp = Vector3.normalize(new Vector3(5, 0, -1));
+    let tmp = Vector3.normalize(new Vector3(0, 10, -60));
     this.lightArray[0] = tmp.x;
     this.lightArray[1] = tmp.y;
     this.lightArray[2] = tmp.z;
@@ -256,10 +256,10 @@ export class Tetrahedron extends Object {
       0, s * sqrt2 / 2, 0, // Front vertex
     ]);
 
-    for (let i = 0; i < this.vertexLength; i++) {
-      this.vertexArray.set(this.positionArray.subarray(i * this.positionArrayLength, i * this.positionArrayLength + this.positionArrayLength), i * this.oneVertexLength + this.positionOffset / 4);
-    }
     if (this.vertexArray != null) {
+      for (let i = 0; i < this.vertexLength; i++) {
+        this.vertexArray.set(this.positionArray.subarray(i * this.positionArrayLength, i * this.positionArrayLength + this.positionArrayLength), i * this.oneVertexLength + this.positionOffset / 4);
+      }
       device.getDevice().queue.writeBuffer(this.vertexBuffer, 0, this.vertexArray);
     }
   }

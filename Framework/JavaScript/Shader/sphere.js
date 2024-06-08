@@ -37,10 +37,10 @@ export const sphereShader = `
 
   @fragment fn fs(vsOut : VSOutput) -> @location(0) vec4<f32> {
     let normal = normalize(vsOut.normal.xyz);
-    let light = dot(normal, -directionalLight.lightDirection.xyz);
+    let light = dot(normal, directionalLight.lightDirection.xyz);
     let diffuse = max(light, 0.0);
     let color = vsOut.color.rgb * diffuse;
 
-    return vec4<f32>(vsOut.color.rgb, vsOut.color.a);
+    return vec4<f32>(color.rgb, vsOut.color.a);
   }
   `;

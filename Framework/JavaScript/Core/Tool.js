@@ -94,11 +94,11 @@ export class Vector3 {
         return new Vector3(x, y, z);
     }
 
-    static Vec4toVec3(a){
+    static Vec4toVec3(a) {
         new Vector3(a.x, a.y, a.z);
     }
 
-    static ArraytoVec3(a){
+    static ArraytoVec3(a) {
         return new Vector3(a[0], a[1], a[2]);
     }
 }
@@ -111,7 +111,7 @@ export class Vector4 {
         this.w = w;
     }
 
-    static Vec3toVec4(a){
+    static Vec3toVec4(a) {
         new Vector4(a.x, a.y, a.z, 0);
     }
 }
@@ -198,7 +198,7 @@ export class Matrix4 {
 
     static Mat4toFloat32Array(a) {
         let array = new Float32Array(16);
-        
+
         array[0] = a[0][0];
         array[1] = a[0][1];
         array[2] = a[0][2];
@@ -534,7 +534,7 @@ export class Transform {
         this.rotation = new Vector3(0, 0, 0);
     }
 
-    static degreeTOradian(degree) {
+    static degreeToRadian(degree) {
         let radian = degree * (Math.PI / 180);
         return radian;
     }
@@ -564,6 +564,11 @@ class Color {
         this.colorDictionary["red"] = [1, 0, 0, 1];
         this.colorDictionary["green"] = [0, 1, 0, 1];
         this.colorDictionary["blue"] = [0, 0, 1, 1];
+        this.colorDictionary["magenta"] = [1, 0, 1, 1];
+        this.colorDictionary["yellow"] = [1, 1, 0, 1];
+        this.colorDictionary["cyan"] = [0, 1, 1, 1];
+        this.colorDictionary["gray"] = [0.5, 0.5, 0.5, 1];
+        this.colorDictionary["pink"] = [1, 0.5, 0.5, 1];
     }
 
     GetColorName(colorCode) {

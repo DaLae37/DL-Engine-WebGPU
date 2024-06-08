@@ -7,10 +7,8 @@ export class Object {
         this.name = name;
         this.isLoaded = false;
 
-        this.module = null;
         this.pipeline = null;
         this.bindGroup = null;
-        this.renderPassDescriptor = null;
 
         this.uniformBufferSize = 0;
         this.uniformBuffer = null;
@@ -33,6 +31,10 @@ export class Object {
 
     }
 
+    GetPosition(){
+        return this.transform.position;
+    }
+
     SetTransform(){
         this.worldMatrix = Matrix4.identity();
         this.rotationMatrix = Matrix4.identity();    
@@ -52,7 +54,7 @@ export class Object {
 
     SetRotation(rotation) {
         let position = this.transform.position;
-        let radians = new Vector3(Transform.degreeTOradian(rotation.x), Transform.degreeTOradian(rotation.y), Transform.degreeTOradian(rotation.z));
+        let radians = new Vector3(Transform.degreeToRadian(rotation.x), Transform.degreeToRadian(rotation.y), Transform.degreeToRadian(rotation.z));
         let offset = Vector3.subtract(radians, this.transform.rotation);
 
         this.Translate(new Vector3(-this.transform.position.x, -this.transform.position.y, -this.transform.position.z));
@@ -75,7 +77,7 @@ export class Object {
 
     Rotate(offset) {
         let position = this.transform.position;
-        let radians = new Vector3(Transform.degreeTOradian(offset.x), Transform.degreeTOradian(offset.y), Transform.degreeTOradian(offset.z));
+        let radians = new Vector3(Transform.degreeToRadian(offset.x), Transform.degreeToRadian(offset.y), Transform.degreeToRadian(offset.z));
 
         this.Translate(new Vector3(-this.transform.position.x, -this.transform.position.y, -this.transform.position.z));
         this.worldMatrix = Transform.rotate(this.worldMatrix, radians);
@@ -85,3 +87,42 @@ export class Object {
         this.transform.rotation = Vector3.add(this.transform.rotation, radians);
     }
 }
+
+class ObjectManager {
+    constructor() {
+        this.imageDictionary = {}; //Dictionary
+        this.modelDictionary = {}; //Dictionary
+    }
+
+    async LoadImageToSrc(src) {
+        if (src in this.imageDictionary) {
+            return this.imageDictionary[src];
+        }
+        else {
+            let response = await fetch(src);
+
+            if (response.ok) {
+                let image = await createImageBitmap(await response.blob());
+                this.imageDictionary[src] = image;
+                return image;
+            }
+        }
+    }
+
+    async LoadModelToSrc(src){
+        if (src in this.modelDictionary) {
+            return this.modelDictionary[src];
+        }
+        else {
+            let response = await fetch(src);
+
+            if (response.ok) {
+                let model = await response.text();
+                this.modelDictionary[src] = model;
+                return model;
+            }
+        }
+    }
+}
+
+export const objectManager = new ObjectManager();

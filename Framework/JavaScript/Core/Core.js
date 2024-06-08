@@ -84,7 +84,8 @@ class Device {
 }
 
 import { spriteShader } from "../Shader/sprite.js"
-import { cubeShader, textureCubeShader } from "../Shader/cube.js";
+import { modelShader } from "../Shader/model.js";
+import { cubeShader } from "../Shader/cube.js";
 import { sphereShader } from "../Shader/sphere.js";
 import { tetrahedronShader } from "../Shader/tetrahedron.js";
 
@@ -97,10 +98,10 @@ class ShaderModule {
     SetShader() {
         if (device.getDevice()) { //Add Using Shaders
             this.shaderDictionary["sprite"] = spriteShader;
+            this.shaderDictionary["model"] = modelShader;
             this.shaderDictionary["cube"] = cubeShader;
             this.shaderDictionary["sphere"] = sphereShader;
             this.shaderDictionary["tetrahedron"] = tetrahedronShader;
-            this.shaderDictionary["textureShader"] = textureCubeShader;
             //this.shaderDictionary["label"] = shader;
         }
         else {

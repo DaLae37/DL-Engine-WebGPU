@@ -1,6 +1,6 @@
 import { Engine } from "./Core/Engine.js";
-import { DemoScene1 } from "../../Resource/Scenes/DemoScene1.js" //Input First Scene File Names
+import { DemoScene2 } from "../../Resource/Scenes/DemoScene2.js" //Input First Scene File Names
 
 const engine = new Engine();
 await engine.Init();
-engine.DoMainLoop(new DemoScene1("DemoScene1")); //Create First Scene
+engine.DoMainLoop(new DemoScene2("DemoScene2")); //Create First Scene
