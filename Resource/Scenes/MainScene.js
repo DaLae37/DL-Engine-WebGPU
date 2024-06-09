@@ -15,7 +15,7 @@ export class MainScene extends Scene {
         this.AddObject(this.cube1);
         this.AddObject(this.cube2);
         this.AddObject(this.sphere);
-        
+
         //this.cube1.SetRotation(new Vector3(45, 0, 0));
         this.cube1.SetPosition(new Vector3(-5, 0, 0));
         this.cube2.SetRotation(new Vector3(0, 0, 0));

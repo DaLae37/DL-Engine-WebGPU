@@ -16,6 +16,9 @@ export class Camera {
         this.at = new Vector3(0, 0, 0);
         this.up = new Vector3(0, 1, 0);
 
+        this.near = 1;
+        this.far = 100;
+
         this.fieldOfView = Transform.degreeToRadian(90);
         this.pitch = 0;
         this.yaw = 0;
@@ -24,7 +27,7 @@ export class Camera {
 
     Update(deltaTime) {
         this.rotationMatrix = Transform.rotate(this.rotationMatrix, new Vector3(this.pitch, this.yaw, this.roll));
-        this.projectionMatrix = this.perspective(this.fieldOfView, canvas.getCanvas().clientWidth / canvas.getCanvas().clientHeight, 1, 100);
+        this.projectionMatrix = this.perspective(this.fieldOfView, canvas.getCanvas().clientWidth / canvas.getCanvas().clientHeight, this.near, this.far);
 
         this.matrix = this.look(this.eye, this.at, this.up);
         this.viewMatrix = Matrix4.inverse(this.matrix);

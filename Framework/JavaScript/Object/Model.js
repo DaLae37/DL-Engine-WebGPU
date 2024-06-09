@@ -71,6 +71,20 @@ class Model extends Object {
             size: this.uniformBufferSize,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
+
+        this.lightBufferSize = 4 * 4;
+        this.lightBuffer = device.getDevice().createBuffer({
+            label: this.name,
+            size: this.lightBufferSize,
+            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        });
+        this.lightArray = new Float32Array(4);
+        let tmp = Vector3.normalize(new Vector3(0, -100, -100));
+        this.lightArray[0] = tmp.x;
+        this.lightArray[1] = tmp.y;
+        this.lightArray[2] = tmp.z;
+        this.lightArray[3] = 0;
+        device.getDevice().queue.writeBuffer(this.lightBuffer, 0, this.lightArray);
     }
 
     Update(deltaTime, cameraMatrix) {
@@ -119,20 +133,20 @@ export class OBJModel extends Model {
                     {
                         arrayStride: (4 + 4 + 2) * 4,
                         attributes: [
-                            {
+                            { //position
                                 shaderLocation: 0,
                                 offset: 0,
                                 format: "float32x4",
                             },
-                            {
+                            { //uv
                                 shaderLocation: 1,
                                 offset: (4) * 4,
-                                format: "float32x4",
-                            },
-                            {
-                                shaderLocation: 2,
-                                offset: (4 + 4) * 4,
                                 format: "float32x2",
+                            },
+                            { //normal
+                                shaderLocation: 2,
+                                offset: (4 + 2) * 4,
+                                format: "float32x4",
                             },
                         ],
                     },
@@ -175,61 +189,71 @@ export class OBJModel extends Model {
                         size: this.uniformBufferSize,
                     }
                 },
+                {
+                    binding: 3,
+                    resource: {
+                    buffer: this.lightBuffer,
+                    size: this.lightBufferSize,
+                }
+                },
             ],
         });
 
 
-    }
+}
 
-    parseOBJ(obj) {
-        let lines = obj.split("\n");
-        let positions = [];
-        let normals = [];
-        let texcoords = [];
-        let indices = [];
+parseOBJ(obj) {
+    let lines = obj.split("\n");
+    let positions = [];
+    let normals = [];
+    let uvs = [];
 
-        this.vertexArray = [];
-        this.indexArray = [];
+    let vertices = []
+    let indices = [];
 
-        for (let line of lines) {
-            if (line.startsWith("#")) {
-                continue;
+    this.vertexArray = [];
+    this.indexArray = [];
+
+    for (let line of lines) {
+        if (line.startsWith("#")) {
+            continue;
+        }
+        else {
+            let part = line.split(" ");
+            if (line.startsWith("v ")) {
+                positions.push(Number(part[1]), Number(part[2]), Number(part[3]), 1);
             }
-            else {
-                let parts = line.trim().split(/\s+/);
-                let keyword = parts.shift();
+            else if (line.startsWith("vn ")) {
+                normals.push(Number(part[1]), Number(part[2]), Number(part[3]), 1);
+            }
+            else if (line.startsWith("vt ")) {
+                uvs.push(Number(part[1]), Number(part[2]));
+            }
+            else if (line.startsWith("f ")) {
+                for (let i = 1; i <= 3; i++) {
+                    let face = part[i].split("/");
+                    let positionIndex = Number(face[0]) - 1;
+                    let uvIndex = face[1] ? Number(face[1]) - 1 : positionIndex;
+                    let normalIndex = face[2] ? Number(face[2]) - 1 : positionIndex;
 
-                switch (keyword) {
-                    case "v":
-                        parts.push(1);
-                        positions.push(parts.map(parseFloat));
-                        break;
-                    case "vn":
-                        normals.push(parts.map(parseFloat));
-                        parts.push(1);
-                        break;
-                    case "vt":
-                        texcoords.push(parts.map(parseFloat));
-                        break;
-                    case "f":
-                        for (const part of parts) {
-                            const [positionIndex, texcoordIndex, normalIndex] = part.split("/").map(str => parseInt(str, 10) - 1);
+                    let vertex = [
+                        ...positions.slice(positionIndex * 4, positionIndex * 4 + 4),
+                        ...uvs.slice(uvIndex * 2, uvIndex * 2 + 2),
+                        ...normals.slice(normalIndex * 4, normalIndex * 4 + 4)
+                    ];
 
-                            this.vertexArray.push(...positions[positionIndex]);
-
-                            if (texcoordIndex !== undefined && texcoordIndex !== null) {
-                                this.vertexArray.push(...texcoords[texcoordIndex]);
-                            }
-                            if (normalIndex !== undefined && normalIndex !== null) {
-                                this.vertexArray.push(...normals[normalIndex]);
-                            }
-
-                            indices.push(indices.length);
-                        }
-                        break;
+                    let index = vertices.findIndex(v => v.every((val, idx) => val === vertex[idx]));
+                    if (index === -1) {
+                        vertices.push(vertex);
+                        indices.push(vertices.length - 1);
+                    } else {
+                        indices.push(index);
+                    }
                 }
             }
         }
-        this.indexArray = indices;
     }
+    this.vertexArray = new Float32Array(vertices.flat());
+    this.indexArray = new Uint32Array(indices);
+}
 }
