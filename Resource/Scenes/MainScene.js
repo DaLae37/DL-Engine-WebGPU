@@ -83,4 +83,3 @@ export class MainScene extends Scene {
         super.Render(deltaTime, pass);
     }
 }
-

@@ -41,6 +41,6 @@ struct ModelUniform {
     let diffuse = max(light * 1.2, 0.0);
     let color = textureColor.rgb * diffuse;
     
-    return vec4<f32>(color.rgb, 0.7);
+    return vec4<f32>(textureColor.rgb, 1.0);
 }
 `;

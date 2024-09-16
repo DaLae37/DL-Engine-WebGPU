@@ -8,6 +8,8 @@ MIT License
 
 # Descriptioon
 
+[Document](https://github.com/DaLae37/DL-Engine-WebGPU/document.pdf)
+
 [Youtube](https://youtu.be/-EQkuyZg0Ck)
 
 # Demo Scene

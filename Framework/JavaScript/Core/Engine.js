@@ -4,7 +4,7 @@ import { inputManager } from "./Input.js";
 
 export class Engine {
     constructor() {
-        this.FPS = 60;
+        this.FPS = 165;
 
         this.currentTime = 0;
         this.previousTime = 0;
