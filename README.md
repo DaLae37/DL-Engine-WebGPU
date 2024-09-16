@@ -8,7 +8,7 @@ MIT License
 
 # Descriptioon
 
-[Document](https://github.com/DaLae37/DL-Engine-WebGPU/document.pdf)
+[Document](https://github.com/DaLae37/DL-Engine-WebGPU/blob/main/document.pdf)
 
 [Youtube](https://youtu.be/-EQkuyZg0Ck)
 
