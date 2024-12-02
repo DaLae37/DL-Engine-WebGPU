@@ -1,6 +1,7 @@
 # DL-Engine-WebGPU
 
 ![Logo](https://github.com/gpuweb/gpuweb/blob/main/logo/webgpu-responsive.svg)
+![DL-Engine](https://www.dalae37.com/resource/image/dl-logo.png)
 
 # License
 
